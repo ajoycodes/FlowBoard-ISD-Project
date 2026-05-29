@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlowBoard Wireframe References</title>
+    <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+      }
+      body {
+        margin: 0;
+        background: #f8fafc;
+        color: #0f172a;
+      }
+      .wrap {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 40px;
+        display: grid;
+        gap: 28px;
+      }
+      .hero {
+        background: #fff;
+        border: 2px solid #cbd5e1;
+        border-radius: 24px;
+        padding: 24px 28px;
+      }
+      .hero h1 {
+        margin: 0 0 8px;
+        font-size: 34px;
+        line-height: 1.1;
+      }
+      .hero p {
+        margin: 0;
+        color: #64748b;
+        font-size: 16px;
+      }
+      .grid {
+        display: grid;
+        gap: 24px;
+      }
+      .card {
+        background: #fff;
+        border: 2px solid #cbd5e1;
+        border-radius: 24px;
+        padding: 20px;
+      }
+      .card h2 {
+        margin: 0 0 16px;
+        font-size: 22px;
+      }
+      .shot {
+        width: 100%;
+        display: block;
+        border: 1px solid #cbd5e1;
+        border-radius: 16px;
+      }
+      .stack {
+        display: grid;
+        gap: 20px;
+      }
+      .meta {
+        color: #64748b;
+        font-size: 14px;
+        margin-top: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="hero">
+        <h1>FlowBoard Sprint 0 wireframes</h1>
+        <p>Taskboard, dashboard, and login references for the Figma upload.</p>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h2>Taskboard</h2>
+          <img class="shot" src="/screenshots/taskboard-wireframe.png" alt="Taskboard wireframe screenshot" />
+        </article>
+
+        <article class="card">
+          <h2>Dashboard</h2>
+          <img class="shot" src="/screenshots/dashboard-wireframe.png" alt="Dashboard wireframe screenshot" />
+        </article>
+
+        <article class="card">
+          <h2>Login</h2>
+          <img class="shot" src="/screenshots/login-wireframe.png" alt="Login wireframe screenshot" />
+        </article>
+      </section>
+
+      <div class="meta">Prepared for Figma import from the local dev server.</div>
+    </main>
+  </body>
+</html>
