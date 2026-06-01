@@ -1,10 +1,13 @@
-.registration-form{max-width:640px;margin:0 auto;padding:1rem}
-.registration-form h2{margin:0 0 1rem}
-.rf-error{color:#b00020;background:#fff0f0;padding:.5rem;border-radius:4px;margin-bottom:1rem}
-.rf-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
-.registration-form label{display:block}
-.registration-form input[type="text"],.registration-form input[type="email"],.registration-form input[type="password"]{width:100%;padding:.5rem;border:1px solid #ccc;border-radius:4px}
-.rf-terms{grid-column:1 / -1;display:flex;align-items:center;gap:.5rem}
-.rf-actions{margin-top:1rem;grid-column:1 / -1}
-.primary-btn{background:#0366d6;color:#fff;padding:.5rem 1rem;border:none;border-radius:4px}
-@media (max-width:600px){.rf-grid{grid-template-columns:1fr}}
+.auth-root{--primary:#1e6fff;--primary-600:#165fe0;--bg:#f6fbff;--surface:#ffffff;--muted:#6b7280}
+.registration-form{max-width:680px;margin:1.5rem auto;padding:1.25rem;background:var(--surface);border-radius:10px;box-shadow:0 8px 24px rgba(13,38,76,0.06)}
+.registration-form h2{margin:0 0 1rem;color:var(--primary)}
+.rf-error{color:#b00020;background:#fff0f0;padding:.6rem;border-radius:6px;margin-bottom:1rem}
+.rf-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.registration-form label{display:block;font-size:0.95rem;color:var(--muted)}
+.registration-form input[type="text"],.registration-form input[type="email"],.registration-form input[type="password"]{width:100%;padding:.6rem;border:1px solid #e6eefc;border-radius:8px;background:linear-gradient(180deg,#fff,#fbfdff);transition:box-shadow .15s,border-color .15s}
+.registration-form input:focus{outline:none;box-shadow:0 0 0 6px rgba(30,111,255,0.12);border-color:var(--primary-600)}
+.rf-terms{grid-column:1 / -1;display:flex;align-items:center;gap:.5rem;color:var(--muted)}
+.rf-actions{margin-top:1rem;grid-column:1 / -1;display:flex;justify-content:flex-end}
+.primary-btn{background:linear-gradient(180deg,var(--primary),var(--primary-600));color:#fff;padding:.6rem 1.1rem;border:none;border-radius:8px;box-shadow:0 8px 20px rgba(30,111,255,0.12);cursor:pointer}
+.primary-btn:disabled{opacity:0.6;cursor:not-allowed}
+@media (max-width:680px){.rf-grid{grid-template-columns:1fr}.registration-form{padding:1rem;margin:1rem}}
