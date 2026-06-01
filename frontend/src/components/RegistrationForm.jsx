@@ -1,73 +1,96 @@
-import React, { useState } from 'react';
-import './RegistrationForm.css';
+import React from 'react'
+import { register } from '../lib/api'
+import './RegistrationForm.css'
 
-export default function RegistrationForm({ onRegistered }) {
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '', role: '' });
-  const [error, setError] = useState('');
-  const [submitting, setSubmitting] = useState(false);
+export default function RegistrationForm({ onNavigate }) {
+  const [form, setForm] = React.useState({
+    name: 'Fariha',
+    email: 'fariha@flowboard.local',
+    role: 'Frontend Developer',
+    password: 'flowboard123',
+    confirm: 'flowboard123'
+  })
+  const [status, setStatus] = React.useState('')
+  const [loading, setLoading] = React.useState(false)
 
-  const update = (key, value) => setForm(f => ({ ...f, [key]: value }));
+  const update = (key, value) => setForm(current => ({ ...current, [key]: value }))
 
-  const validate = () => {
-    if (!form.name || !form.email || !form.password || !form.confirm) {
-      return 'Please fill all required fields.';
-    }
-    if (form.password !== form.confirm) return 'Passwords do not match.';
-    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRe.test(form.email)) return 'Please enter a valid email.';
-    return '';
-  };
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    const v = validate();
-    if (v) return setError(v);
-    setSubmitting(true);
-    try {
-      // Minimal stub for registration action; adapt to app API.
-      await new Promise(r => setTimeout(r, 400));
-      if (onRegistered) onRegistered({ ...form });
-    } catch (err) {
-      setError('Registration failed.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    setLoading(true)
+    setStatus('Creating your account...')
+    await register(form)
+    setLoading(false)
+    setStatus('Account ready. Continue to login in the real app.')
+  }
 
   return (
-    <form className="registration-form" onSubmit={onSubmit} aria-labelledby="register-heading">
-      <h2 id="register-heading">Create your account</h2>
-      {error && <div role="alert" className="rf-error">{error}</div>}
-      <div className="rf-grid">
-        <label>
-          <span>Name</span>
-          <input aria-label="Full name" required value={form.name} onChange={e => update('name', e.target.value)} />
-        </label>
-        <label>
-          <span>Role</span>
-          <input aria-label="Role" value={form.role} onChange={e => update('role', e.target.value)} />
-        </label>
-        <label>
-          <span>Email</span>
-          <input aria-label="Email address" type="email" required value={form.email} onChange={e => update('email', e.target.value)} />
-        </label>
-        <label>
-          <span>Password</span>
-          <input aria-label="Password" type="password" required value={form.password} onChange={e => update('password', e.target.value)} />
-        </label>
-        <label>
-          <span>Confirm password</span>
-          <input aria-label="Confirm password" type="password" required value={form.confirm} onChange={e => update('confirm', e.target.value)} />
-        </label>
-        <label className="rf-terms">
-          <input aria-label="Agree to terms" type="checkbox" required />
-          <span>I agree to the terms</span>
-        </label>
-      </div>
-      <div className="rf-actions">
-        <button type="submit" className="primary-btn" disabled={submitting}>{submitting ? 'Creating account...' : 'Create account'}</button>
-      </div>
-    </form>
-  );
+    <div className="auth-layout">
+      <section className="auth-hero panel">
+        <span className="eyebrow">Join the team</span>
+        <h1>Set up the collaborative workspace for any project.</h1>
+        <p>
+          Register once and start managing the dashboard, task board, notes, members, and activity stream.
+        </p>
+        <ul className="feature-list">
+          <li>Quick account setup for the whole workspace</li>
+          <li>Secure login, recovery, and onboarding flow</li>
+          <li>Ready for Scrum Master and team roles</li>
+        </ul>
+      </section>
+
+      <section className="panel auth-card">
+        <div className="card-header">
+          <div>
+            <span className="eyebrow">Register</span>
+            <h2>Create your account</h2>
+          </div>
+          <span className="status-dot live">Live demo</span>
+        </div>
+
+        <form className="stack" onSubmit={handleSubmit}>
+          <div className="form-grid two-col">
+            <div className="form-group">
+              <label>Name</label>
+              <input type="text" value={form.name} onChange={event => update('name', event.target.value)} required />
+            </div>
+            <div className="form-group">
+              <label>Role</label>
+              <input type="text" value={form.role} onChange={event => update('role', event.target.value)} required />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Email</label>
+            <input type="email" value={form.email} onChange={event => update('email', event.target.value)} required />
+          </div>
+
+          <div className="form-grid two-col">
+            <div className="form-group">
+              <label>Password</label>
+              <input type="password" value={form.password} onChange={event => update('password', event.target.value)} required />
+            </div>
+            <div className="form-group">
+              <label>Confirm password</label>
+              <input type="password" value={form.confirm} onChange={event => update('confirm', event.target.value)} required />
+            </div>
+          </div>
+
+          <label className="terms-row">
+            <input type="checkbox" required />
+            <span>I agree to the terms and privacy policy</span>
+          </label>
+
+          <button className="primary-btn" type="submit" disabled={loading}>
+            {loading ? 'Creating account...' : 'Create account'}
+          </button>
+          {status ? <p className="hint">{status}</p> : null}
+
+          <div className="inline-actions">
+            <button type="button" className="ghost-btn full" onClick={() => onNavigate && onNavigate('login')}>Back to login</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  )
 }
