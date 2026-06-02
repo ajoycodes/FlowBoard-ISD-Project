@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 <?php
 
 namespace App\Http\Controllers\Api;
@@ -94,4 +92,4 @@ class AuthController extends Controller
         ], 200);
     }
 }
->>>>>>> Stashed changes
+
