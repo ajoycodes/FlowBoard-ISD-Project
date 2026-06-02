@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { getWorkspaces, deleteWorkspace } from '../lib/api'
 import DashboardLayout from './DashboardLayout'
 import Workspace from './Workspace'
 import './Dashboard.css'
@@ -34,13 +35,22 @@ function priorityClass(priority) {
 }
 
 export default function Dashboard({ onNavigate }) {
-  const [workspaces, setWorkspaces] = useState(INITIAL_WORKSPACES)
+  const [workspaces, setWorkspaces] = useState([])
+const [recentTasks, setRecentTasks] = useState([])
+const [loading, setLoading] = useState(false)
+const [error, setError] = useState('')
   const [showModal,  setShowModal]  = useState(false)
 
-  const handleDelete = (id) => {
-    if (!window.confirm('Delete this workspace?')) return
+  const handleDelete = async (id) => {
+  if (!window.confirm('Delete this workspace?')) return
+
+  try {
+    await deleteWorkspace(id)
     setWorkspaces(prev => prev.filter(w => w.id !== id))
+  } catch (error) {
+    setError(error.message || 'Failed to delete workspace.')
   }
+}
 
   const handleCreated = (newWs) => {
     setWorkspaces(prev => [...prev, newWs])
@@ -49,6 +59,24 @@ export default function Dashboard({ onNavigate }) {
 
   // pass first workspace id so the sidebar Activity link is always enabled
   const firstWsId = workspaces[0]?.id ?? 1
+
+  useEffect(() => {
+  async function loadDashboard() {
+    try {
+      setLoading(true)
+      setError('')
+
+      const result = await getWorkspaces()
+      setWorkspaces(result.data || result)
+    } catch (error) {
+      setError(error.message || 'Failed to load dashboard.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  loadDashboard()
+}, [])
 
   return (
     <DashboardLayout activeNav="dashboard" onNavigate={onNavigate} workspaceId={firstWsId}>

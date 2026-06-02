@@ -25,12 +25,32 @@ function AuthShell({ children }) {
 
 // ── App ───────────────────────────────────────────────────────────
 export default function App() {
-  const [route, setRoute] = useState({ page: 'login', workspaceId: null })
+  const [route, setRoute] = useState(() => {
+  const token = localStorage.getItem('token')
+
+  return {
+    page: token ? 'dashboard' : 'login',
+    workspaceId: null,
+  }
+})
 
   // navigate('login') | navigate('dashboard') | navigate('workspace', id) …
   const navigate = (page, workspaceId = null) => setRoute({ page, workspaceId })
 
   const { page, workspaceId } = route
+
+  const token = localStorage.getItem('token')
+
+if (!token && ['dashboard', 'workspace', 'activity'].includes(page)) {
+  return (
+    <AuthShell>
+      <Login
+        onLogin={() => navigate('dashboard')}
+        onNavigate={navigate}
+      />
+    </AuthShell>
+  )
+}
 
   // ── Dashboard pages ──
   if (page === 'dashboard') return <Dashboard  onNavigate={navigate} />

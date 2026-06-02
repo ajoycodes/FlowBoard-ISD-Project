@@ -1,87 +1,50 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { getTasks, getActivityLogs } from '../lib/api'
 import DashboardLayout from './DashboardLayout'
 import './ActivityLog.css'
 
-// ── All workspace tasks, each with their own activity log ──────────
-// workspaceId is used to label the heading; tasks are shared across
-// all mock workspaces for demo purposes.
-const WORKSPACE_TASKS = [
-  {
-    id: 1,
-    title: 'Activity log API endpoint',
-    assignee: 'Dev 3',
-    status: 'To Do',
-    activity: [
-      { id: 101, action: 'Task created',               user: 'Dev 3',  created_at: '2026-06-04T09:00:00Z' },
-      { id: 102, action: 'Priority set to Medium',     user: 'Dev 3',  created_at: '2026-06-04T09:05:00Z' },
-      { id: 103, action: 'Deadline set to Jun 10',     user: 'Fariha', created_at: '2026-06-04T09:10:00Z' },
-      { id: 104, action: 'Assigned to Dev 3',          user: 'Fariha', created_at: '2026-06-04T09:15:00Z' },
-    ],
-  },
-  {
-    id: 2,
-    title: 'Write unit tests',
-    assignee: 'Dev 2',
-    status: 'To Do',
-    activity: [
-      { id: 201, action: 'Task created',               user: 'Dev 2',  created_at: '2026-06-05T10:00:00Z' },
-      { id: 202, action: 'Assigned to Dev 2',          user: 'Fariha', created_at: '2026-06-05T10:05:00Z' },
-      { id: 203, action: 'Deadline set to Jun 15',     user: 'Dev 2',  created_at: '2026-06-05T10:10:00Z' },
-    ],
-  },
-  {
-    id: 3,
-    title: 'Design dashboard UI',
-    assignee: 'Fariha',
-    status: 'In Progress',
-    activity: [
-      { id: 301, action: 'Task created',               user: 'Fariha', created_at: '2026-06-02T08:00:00Z' },
-      { id: 302, action: 'Priority set to High',       user: 'Fariha', created_at: '2026-06-02T08:05:00Z' },
-      { id: 303, action: 'Status moved to In Progress',user: 'Fariha', created_at: '2026-06-03T09:00:00Z' },
-      { id: 304, action: 'Deadline updated to Jun 5',  user: 'Dev 3',  created_at: '2026-06-03T11:30:00Z' },
-    ],
-  },
-  {
-    id: 4,
-    title: 'Set up Oracle schema',
-    assignee: 'Dev 2',
-    status: 'In Progress',
-    activity: [
-      { id: 401, action: 'Task created',               user: 'Dev 2',  created_at: '2026-06-01T14:00:00Z' },
-      { id: 402, action: 'Schema draft uploaded',       user: 'Dev 2',  created_at: '2026-06-02T10:00:00Z' },
-      { id: 403, action: 'Status moved to In Progress',user: 'Dev 2',  created_at: '2026-06-02T10:30:00Z' },
-    ],
-  },
-  {
-    id: 5,
-    title: 'Implement login page',
-    assignee: 'Fariha',
-    status: 'Done',
-    activity: [
-      { id: 501, action: 'Task created',               user: 'Fariha', created_at: '2026-05-28T09:00:00Z' },
-      { id: 502, action: 'Priority set to High',       user: 'Fariha', created_at: '2026-05-28T09:05:00Z' },
-      { id: 503, action: 'Status moved to In Progress',user: 'Fariha', created_at: '2026-05-29T08:00:00Z' },
-      { id: 504, action: 'Status moved to Done',       user: 'Fariha', created_at: '2026-06-01T17:00:00Z' },
-      { id: 505, action: 'Task marked as completed',   user: 'Dev 3',  created_at: '2026-06-01T17:10:00Z' },
-    ],
-  },
-  {
-    id: 6,
-    title: 'Configure Vite project',
-    assignee: 'Dev 3',
-    status: 'Done',
-    activity: [
-      { id: 601, action: 'Task created',               user: 'Dev 3',  created_at: '2026-05-20T10:00:00Z' },
-      { id: 602, action: 'Vite config committed',      user: 'Dev 3',  created_at: '2026-05-20T11:30:00Z' },
-      { id: 603, action: 'Status moved to Done',       user: 'Dev 3',  created_at: '2026-05-20T12:00:00Z' },
-    ],
-  },
-]
 
-// Flatten all activity entries across all tasks (sorted newest-first)
-const ALL_ACTIVITY = WORKSPACE_TASKS
-  .flatMap(t => t.activity.map(a => ({ ...a, taskTitle: t.title })))
-  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+const [tasks, setTasks] = useState([])
+const [activity, setActivity] = useState([])
+const [selectedId, setSelectedId] = useState(initialTaskId ?? null)
+const [filterDate, setFilterDate] = useState('')
+const [loading, setLoading] = useState(false)
+const [error, setError] = useState('')
+
+useEffect(() => {
+  async function loadTasks() {
+    try {
+      const result = await getTasks(workspaceId)
+      setTasks(result.data || result)
+    } catch (error) {
+      setError(error.message || 'Failed to load task list.')
+    }
+  }
+
+  if (workspaceId) loadTasks()
+}, [workspaceId])
+
+useEffect(() => {
+  async function loadActivityLogs() {
+    try {
+      setLoading(true)
+      setError('')
+
+      const params = {}
+      if (selectedId) params.task_id = selectedId
+      if (filterDate) params.date = filterDate
+
+      const result = await getActivityLogs(workspaceId, params)
+      setActivity(result.data || result)
+    } catch (error) {
+      setError(error.message || 'Failed to load activity logs.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (workspaceId) loadActivityLogs()
+}, [workspaceId, selectedId, filterDate])
 
 function formatTimestamp(ts) {
   const d = new Date(ts)
@@ -136,13 +99,13 @@ export default function ActivityLog({ workspaceId, taskId: initialTaskId, onNavi
             onClick={() => { setSelectedId(null); setFilterDate('') }}
           >
             <span className="al-task-btn-title">All Activity</span>
-            <span className="al-task-btn-count">{ALL_ACTIVITY.length}</span>
+            <span className="al-task-btn-count">{activity.length}</span>
           </button>
 
           <div className="al-task-divider" />
 
           {/* Individual tasks */}
-          {WORKSPACE_TASKS.map(task => {
+          {tasks.map(task => {
             const sc = STATUS_COLOR[task.status] || STATUS_COLOR['To Do']
             return (
               <button
@@ -216,7 +179,7 @@ export default function ActivityLog({ workspaceId, taskId: initialTaskId, onNavi
                 <span>User</span>
                 <span>Timestamp</span>
               </div>
-              {displayed.map((item, i) => (
+              {activity.map((item, i) => (
                 <div
                   key={item.id}
                   className={`al-row${i % 2 === 0 ? ' al-row--alt' : ''}${selectedId === null ? ' al-row--wide' : ''}`}

@@ -2,15 +2,24 @@ import React from 'react'
 import { requestPasswordReset } from '../lib/api'
 
 export default function ForgotPassword({ onNavigate }) {
-  const [email, setEmail] = React.useState('fariha@flowboard.local')
+  const [email, setEmail] = React.useState('')
+const [loading, setLoading] = React.useState(false)
   const [status, setStatus] = React.useState('')
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setStatus('Sending reset instructions...')
+  e.preventDefault()
+  setLoading(true)
+  setStatus('Sending reset instructions...')
+
+  try {
     await requestPasswordReset(email)
-    setStatus('Reset email ready. Check your inbox in the real app.')
+    setStatus('If this email is registered, a password reset link has been sent.')
+  } catch (error) {
+    setStatus(error.message || 'Failed to send reset link. Please try again.')
+  } finally {
+    setLoading(false)
   }
+}
 
   return (
     <div className="auth-layout">
@@ -41,7 +50,9 @@ export default function ForgotPassword({ onNavigate }) {
             <label>Email</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
           </div>
-          <button className="primary-btn" type="submit">Send reset link</button>
+          <button className="primary-btn" type="submit" disabled={loading}>
+  {loading ? 'Sending...' : 'Send reset link'}
+</button>
           {status && <p className="hint">{status}</p>}
           <button type="button" className="ghost-btn full" onClick={() => onNavigate('login')}>
             Back to login
