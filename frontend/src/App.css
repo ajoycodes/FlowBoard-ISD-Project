@@ -242,3 +242,4 @@ body {
   .card-header { flex-direction: column; align-items: flex-start; }
   /* two-col already auto-collapses via minmax — no override needed */
 }
+
