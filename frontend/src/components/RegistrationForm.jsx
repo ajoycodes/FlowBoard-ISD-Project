@@ -4,26 +4,38 @@ import './RegistrationForm.css'
 
 export default function RegistrationForm({ onNavigate }) {
   const [form, setForm] = React.useState({
-    name: 'Fariha',
-    email: 'fariha@flowboard.local',
-    role: 'Frontend Developer',
-    password: 'flowboard123',
-    confirm: 'flowboard123'
-  })
+  name: '',
+  email: '',
+  role: '',
+  password: '',
+  confirm: ''
+})
   const [status, setStatus] = React.useState('')
   const [loading, setLoading] = React.useState(false)
 
   const update = (key, value) => setForm(current => ({ ...current, [key]: value }))
 
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-    setLoading(true)
-    setStatus('Creating your account...')
-    await register(form)
-    setLoading(false)
-    setStatus('Account ready. Continue to login in the real app.')
+  const handleSubmit = async (e) => {
+  e.preventDefault()
+
+  if (form.password !== form.confirm) {
+    setStatus('Passwords do not match.')
+    return
   }
 
+  setLoading(true)
+  setStatus('Creating your account...')
+
+  try {
+    await register(form)
+    setStatus('')
+    if (onRegistered) onRegistered()
+  } catch (error) {
+    setStatus(error.message || 'Registration failed.')
+  } finally {
+    setLoading(false)
+  }
+}
   return (
     <div className="auth-layout">
       <section className="auth-hero panel">

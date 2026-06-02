@@ -2,19 +2,26 @@ import React from 'react'
 import { login } from '../lib/api'
 import './Login.css'
 
-export default function Login({ onNavigate }){
-  const [email, setEmail] = React.useState('fariha@flowboard.local')
-  const [password, setPassword] = React.useState('flowboard123')
+export default function Login({ onNavigate }) {
+  const [email, setEmail] = React.useState('')
+  const [password, setPassword] = React.useState('')
   const [status, setStatus] = React.useState('')
   const [loading, setLoading] = React.useState(false)
 
-  const handleSubmit = async (event) => {
-    event.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault()
     setLoading(true)
     setStatus('Signing you in...')
-    await login({ email, password })
-    setLoading(false)
-    onNavigate('dashboard')
+
+    try {
+      await login({ email, password })
+      setStatus('')
+      if (onLogin) onLogin()
+    } catch (error) {
+      setStatus(error.message || 'Invalid email or password.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -39,7 +46,7 @@ export default function Login({ onNavigate }){
             <span className="eyebrow">Sign in</span>
             <h2>Welcome back</h2>
           </div>
-          <span className="status-dot live">Live demo</span>
+          <span className="status-dot">Secure</span>
         </div>
 
         <form className="stack" onSubmit={handleSubmit}>
