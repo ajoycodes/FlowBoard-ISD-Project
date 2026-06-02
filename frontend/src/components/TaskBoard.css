@@ -1,0 +1,473 @@
+/* ════════════════════════════════════════════════
+   TaskBoard — SCRUM-46
+   All measurements derived from Taskboard.svg
+   (1440×900 canvas)
+   ════════════════════════════════════════════════ */
+
+/* ── Page shell ──────────────────────────────────── */
+.board-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #F5F5F5;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #111827;
+}
+
+/* ── Navbar ──────────────────────────────────────── */
+/* SVG line 5: height 87px, fill #FAFAFA, stroke #D1D5DB */
+.board-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 88px;
+  background: #FAFAFA;
+  border-bottom: 1px solid #D1D5DB;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  flex-shrink: 0;
+}
+
+.board-brand {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #111827;
+  letter-spacing: -.01em;
+}
+
+.board-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+/* SVG lines 9-10 & 12-13: rx=21.5, h=43, #E5E7EB fill, #9CA3AF border — fully oval pills */
+.board-nav-pill {
+  height: 43px;
+  border-radius: 21.5px;
+  border: 1px solid #9CA3AF;
+  background: #E5E7EB;
+  color: #374151;
+  font-size: .875rem;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 0 1.25rem;
+  cursor: pointer;
+  transition: background .15s, transform .15s;
+  white-space: nowrap;
+}
+.board-nav-pill:hover { background: #D1D5DB; transform: translateY(-1px); }
+
+.board-nav-pill--workspace {
+  background: #EEF5FF;
+  border-color: #BFDBFE;
+  color: #1E40AF;
+}
+.board-nav-pill--workspace:hover { background: #DBEAFE; }
+
+/* ── Page content ────────────────────────────────── */
+.board-content {
+  flex: 1;
+  padding: 1.5rem 2rem 2rem;
+  min-width: 0;
+}
+
+/* Breadcrumb */
+.board-breadcrumb {
+  margin: 0 0 1rem;
+  color: #6B7280;
+  font-size: .85rem;
+}
+
+/* ── Filter / Tabs bar ───────────────────────────── */
+/* SVG line 15: x=32, y=126, w=1375, h=179, rx=11.5, white, #9CA3AF border */
+.board-filter-bar {
+  background: #FFFFFF;
+  border: 1px solid #9CA3AF;
+  border-radius: 11.5px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.board-filter-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: .75rem;
+}
+
+/* SVG lines 18-26: tab pills rx=5.5, h=43, white bg, #9CA3AF border */
+.board-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.board-tab {
+  height: 43px;
+  padding: 0 1.25rem;
+  border-radius: 5.5px;
+  border: 1px solid #9CA3AF;
+  background: #FFFFFF;
+  color: #374151;
+  font-size: .875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  white-space: nowrap;
+}
+.board-tab:hover { background: #F3F4F6; }
+.board-tab--active {
+  background: #E5E7EB;
+  color: #111827;
+  font-weight: 600;
+}
+
+/* SVG line 29: add-task area x=1150, y=188, w=219, h=71, rx=9.5, #E5E7EB, #9CA3AF */
+.board-add-task-btn {
+  height: 43px;
+  padding: 0 1.5rem;
+  border-radius: 9.5px;
+  border: 1px solid #9CA3AF;
+  background: #1e6fff;
+  color: #FFFFFF;
+  font-size: .875rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s, transform .15s;
+}
+.board-add-task-btn:hover { background: #1557d6; transform: translateY(-1px); }
+
+.board-search-row { margin-top: .25rem; }
+
+/* SVG line 28: x=52, y=266, w=619, h=27, rx=5.5, white, #9CA3AF border */
+.board-search {
+  width: 100%;
+  max-width: 619px;
+  height: 36px;
+  padding: 0 .9rem;
+  border: 1px solid #9CA3AF;
+  border-radius: 5.5px;
+  background: #FFFFFF;
+  font-size: .875rem;
+  font-family: inherit;
+  color: #111827;
+  transition: border-color .15s, box-shadow .15s;
+}
+.board-search::placeholder { color: #9CA3AF; }
+.board-search:focus {
+  outline: none;
+  border-color: #6B7280;
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, .15);
+}
+
+/* ── Kanban columns grid ─────────────────────────── */
+/* SVG: 3 columns, each w=423, gap≈53px between them */
+.board-columns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* SVG lines 31/53/75: w=423, h=499, rx=11.5, white, #9CA3AF border */
+.board-column {
+  background: #FFFFFF;
+  border: 1px solid #9CA3AF;
+  border-radius: 11.5px;
+  padding: 1rem;
+  min-height: 499px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* SVG line 34: divider #C7CBD1 at y=402 inside column */
+.board-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: .75rem;
+  margin-bottom: .75rem;
+  border-bottom: 1px solid #D1D5DB;
+}
+
+.board-column-title {
+  font-weight: 600;
+  font-size: .9rem;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.board-column-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 11px;
+  background: #E5E7EB;
+  border: 1px solid #9CA3AF;
+  font-size: .75rem;
+  font-weight: 700;
+  color: #374151;
+  padding: 0 5px;
+}
+
+.board-column-cards {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.board-column-empty {
+  margin: 1.5rem 0 0;
+  text-align: center;
+  color: #9CA3AF;
+  font-size: .85rem;
+}
+
+/* Column footer add-task button */
+.board-col-add-btn {
+  width: 100%;
+  margin-top: .75rem;
+  padding: .55rem;
+  background: #F9FAFB;
+  border: 1px dashed #9CA3AF;
+  border-radius: 9.5px;
+  color: #6B7280;
+  font-size: .85rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  flex-shrink: 0;
+}
+.board-col-add-btn:hover { background: #F3F4F6; color: #374151; }
+
+/* ── Task card ───────────────────────────────────── */
+/* SVG lines 35/44/57/66/79: h=91, rx=9.5, fill #F9FAFB, stroke #D1D5DB */
+.task-card {
+  background: #F9FAFB;
+  border: 1px solid #D1D5DB;
+  border-radius: 9.5px;
+  padding: .75rem 1rem;
+  min-height: 91px;
+  margin-bottom: 10px;
+  cursor: default;
+  transition: border-color .15s;
+}
+.task-card:hover { border-color: #9CA3AF; }
+
+/* Task title */
+.task-title {
+  margin: 0 0 .5rem;
+  color: #111827;
+  font-weight: 500;
+  font-size: .875rem;
+  line-height: 1.4;
+}
+
+/* Badge row */
+/* SVG lines 38-43: h=27, rx=13.5, #E5E7EB bg, #9CA3AF border */
+.task-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: .4rem;
+}
+
+.task-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 27px;
+  padding: 0 .65rem;
+  border-radius: 13.5px;
+  border: 1px solid #9CA3AF;
+  background: #E5E7EB;
+  font-size: .75rem;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+}
+
+/* Priority colours */
+.priority-high   { background: #FEE2E2; color: #DC2626; border-color: #FCA5A5; }
+.priority-medium { background: #E5E7EB; color: #374151; border-color: #9CA3AF; }
+.priority-low    { background: #D1FAE5; color: #065F46; border-color: #6EE7B7; }
+
+/* Assignee initials badge */
+.task-badge-assignee {
+  background: #DBEAFE;
+  color: #1E40AF;
+  border-color: #BFDBFE;
+  font-weight: 700;
+  min-width: 27px;
+  justify-content: center;
+}
+
+/* Deadline text */
+.task-deadline {
+  margin: 0 0 .4rem;
+  color: #6B7280;
+  font-size: .75rem;
+}
+
+/* Action buttons */
+.task-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.task-btn {
+  font-size: .72rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid #9CA3AF;
+  background: #FFFFFF;
+  color: #374151;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .12s, transform .12s;
+  white-space: nowrap;
+}
+.task-btn:hover { background: #F3F4F6; transform: translateY(-1px); }
+
+.task-btn-advance {
+  border-color: #BFDBFE;
+  background: #EEF5FF;
+  color: #1E40AF;
+}
+.task-btn-advance:hover { background: #DBEAFE; }
+
+.task-btn-delete {
+  border-color: #FCA5A5;
+  color: #DC2626;
+  background: #FEF2F2;
+  margin-left: auto;
+}
+.task-btn-delete:hover { background: #FEE2E2; }
+
+/* ── Add Task Modal ───────────────────────────────── */
+.task-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 1rem;
+}
+
+.task-modal {
+  background: #FFFFFF;
+  border-radius: 12px;
+  border: 1px solid #D1D5DB;
+  padding: 1.75rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.14);
+  animation: modal-pop .18s ease-out;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes modal-pop {
+  from { opacity: 0; transform: translateY(-12px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0)     scale(1);   }
+}
+
+.task-modal-title {
+  margin: 0 0 1.25rem;
+  color: #111827;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.task-modal-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.task-modal-textarea {
+  padding: .65rem .9rem;
+  border: 1px solid #9CA3AF;
+  border-radius: 8px;
+  background: #FFFFFF;
+  font-size: .9rem;
+  font-family: inherit;
+  color: #111827;
+  resize: vertical;
+  transition: border-color .15s, box-shadow .15s;
+}
+.task-modal-textarea:focus {
+  outline: none;
+  border-color: #6B7280;
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, .15);
+}
+
+.task-modal-select {
+  padding: .65rem .9rem;
+  border: 1px solid #9CA3AF;
+  border-radius: 8px;
+  background: #FFFFFF;
+  font-size: .9rem;
+  font-family: inherit;
+  color: #111827;
+  cursor: pointer;
+  transition: border-color .15s;
+  appearance: auto;
+}
+.task-modal-select:focus {
+  outline: none;
+  border-color: #6B7280;
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, .15);
+}
+
+.task-modal-actions {
+  display: flex;
+  gap: .75rem;
+  padding-top: .25rem;
+}
+
+.task-modal-error {
+  background: #FEF2F2;
+  border-color: #FCA5A5;
+  color: #DC2626;
+}
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 900px) {
+  .board-content { padding: 1rem 1.25rem 1.5rem; }
+  .board-columns { gap: 12px; }
+}
+
+@media (max-width: 768px) {
+  .board-columns { grid-template-columns: 1fr; }
+  .board-column  { min-height: 280px; }
+  .board-content { padding: 1rem; }
+  .board-navbar  { padding: 0 1rem; }
+  .board-filter-top { flex-direction: column; align-items: flex-start; }
+  .board-add-task-btn { width: 100%; }
+}
+
+@media (max-width: 600px) {
+  .task-modal-row { grid-template-columns: 1fr; }
+  .task-modal-actions { flex-direction: column; }
+}
+
+@media (max-width: 480px) {
+  .board-brand { font-size: 1.1rem; }
+  .board-nav-pill { font-size: .8rem; padding: 0 .9rem; height: 38px; }
+  .board-tabs { gap: 6px; }
+  .board-tab  { height: 36px; padding: 0 .85rem; font-size: .82rem; }
+}
