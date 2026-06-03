@@ -23,7 +23,8 @@ class Workspace extends Model
 
     public function members()
     {
-        return $this->belongsToMany(User::class, 'workspace_members')
+        return $this->belongsToMany(User::class, 'workspace_user')
+            ->withPivot('role')
             ->withTimestamps();
     }
 

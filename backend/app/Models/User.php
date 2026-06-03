@@ -12,7 +12,9 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory,HasApiTokens, Notifiable;
+
+
+    use HasFactory, HasApiTokens, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -48,30 +50,31 @@ class User extends Authenticatable
         ];
     }
 
+=
+    public function ownedWorkspaces()
+    {
+        return $this->hasMany(Workspace::class, 'owner_id');
+    }
+
     public function workspaces()
-{
-    return $this->belongsToMany(Workspace::class, 'workspace_members')
-        ->withTimestamps();
-}
+    {
+        return $this->belongsToMany(Workspace::class, 'workspace_user')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
 
-public function ownedWorkspaces()
-{
-    return $this->hasMany(Workspace::class, 'owner_id');
-}
+    public function assignedTasks()
+    {
+        return $this->hasMany(Task::class, 'assigned_to');
+    }
 
-public function assignedTasks()
-{
-    return $this->hasMany(Task::class, 'assigned_to');
-}
+    public function createdTasks()
+    {
+        return $this->hasMany(Task::class, 'created_by');
+    }
 
-public function createdTasks()
-{
-    return $this->hasMany(Task::class, 'created_by');
-}
-
-public function updatedTasks()
-{
-    return $this->hasMany(Task::class, 'updated_by');
-}
-    
+    public function updatedTasks()
+    {
+        return $this->hasMany(Task::class, 'updated_by');
+    }
 }
