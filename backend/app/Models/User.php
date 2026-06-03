@@ -11,11 +11,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-<<<<<<< Updated upstream
-    use HasFactory, Notifiable;
-=======
     use HasFactory, HasApiTokens, Notifiable;
->>>>>>> Stashed changes
 
     /**
      * The attributes that are mass assignable.
@@ -50,8 +46,6 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-<<<<<<< Updated upstream
-=======
 
     public function ownedWorkspaces()
     {
@@ -79,5 +73,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(Task::class, 'updated_by');
     }
->>>>>>> Stashed changes
 }
