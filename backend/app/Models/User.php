@@ -11,7 +11,11 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
+<<<<<<< Updated upstream
     use HasFactory, Notifiable;
+=======
+    use HasFactory, HasApiTokens, Notifiable;
+>>>>>>> Stashed changes
 
     /**
      * The attributes that are mass assignable.
@@ -46,4 +50,34 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+<<<<<<< Updated upstream
+=======
+
+    public function ownedWorkspaces()
+    {
+        return $this->hasMany(Workspace::class, 'owner_id');
+    }
+
+    public function workspaces()
+    {
+        return $this->belongsToMany(Workspace::class, 'workspace_user')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    public function assignedTasks()
+    {
+        return $this->hasMany(Task::class, 'assigned_to');
+    }
+
+    public function createdTasks()
+    {
+        return $this->hasMany(Task::class, 'created_by');
+    }
+
+    public function updatedTasks()
+    {
+        return $this->hasMany(Task::class, 'updated_by');
+    }
+>>>>>>> Stashed changes
 }
