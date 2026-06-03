@@ -47,4 +47,31 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function workspaces()
+{
+    return $this->belongsToMany(Workspace::class, 'workspace_members')
+        ->withTimestamps();
+}
+
+public function ownedWorkspaces()
+{
+    return $this->hasMany(Workspace::class, 'owner_id');
+}
+
+public function assignedTasks()
+{
+    return $this->hasMany(Task::class, 'assigned_to');
+}
+
+public function createdTasks()
+{
+    return $this->hasMany(Task::class, 'created_by');
+}
+
+public function updatedTasks()
+{
+    return $this->hasMany(Task::class, 'updated_by');
+}
+    
 }

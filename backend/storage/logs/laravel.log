@@ -1439,3 +1439,108 @@ into your web browser: <span class="break-all" style="box-sizing: border-box; fo
 </html>
 --acTNoiln--
   
+[2026-06-03 06:21:24] local.ERROR: Error Code    : 955
+Error Message : ORA-00955: name is already used by an existing object
+Position      : 13
+Statement     : create table "TASKS" ( "ID" number(19,0) not null, "PROJECT_ID" number(19,0) not null, "TITLE" varchar2(255) not null, "DESCRIPTION" clob null, "STATUS" varchar2(255) default 'todo' not null, "ASSIGNED_TO" number(19,0) null, "CREATED_BY" number(19,0) null, "UPDATED_BY" number(19,0) null, "CREATED_AT" timestamp null, "UPDATED_AT" timestamp null, constraint tasks_project_id_fk foreign key ( "PROJECT_ID" ) references "PROJECTS" ( "ID" ) on delete cascade, constraint tasks_assigned_to_fk foreign key ( "ASSIGNED_TO" ) references "USERS" ( "ID" ) on delete set null, constraint tasks_created_by_fk foreign key ( "CREATED_BY" ) references "USERS" ( "ID" ) on delete set null, constraint tasks_updated_by_fk foreign key ( "UPDATED_BY" ) references "USERS" ( "ID" ) on delete set null, constraint tasks_id_pk primary key ( "ID" ) )
+Bindings      : []
+ (Connection: oracle, Host: 127.0.0.1, Port: 1521, Database: xe, SQL: create table "TASKS" ( "ID" number(19,0) not null, "PROJECT_ID" number(19,0) not null, "TITLE" varchar2(255) not null, "DESCRIPTION" clob null, "STATUS" varchar2(255) default 'todo' not null, "ASSIGNED_TO" number(19,0) null, "CREATED_BY" number(19,0) null, "UPDATED_BY" number(19,0) null, "CREATED_AT" timestamp null, "UPDATED_AT" timestamp null, constraint tasks_project_id_fk foreign key ( "PROJECT_ID" ) references "PROJECTS" ( "ID" ) on delete cascade, constraint tasks_assigned_to_fk foreign key ( "ASSIGNED_TO" ) references "USERS" ( "ID" ) on delete set null, constraint tasks_created_by_fk foreign key ( "CREATED_BY" ) references "USERS" ( "ID" ) on delete set null, constraint tasks_updated_by_fk foreign key ( "UPDATED_BY" ) references "USERS" ( "ID" ) on delete set null, constraint tasks_id_pk primary key ( "ID" ) )) {"exception":"[object] (Illuminate\\Database\\QueryException(code: 955): Error Code    : 955
+
+Error Message : ORA-00955: name is already used by an existing object
+
+Position      : 13
+
+Statement     : create table \"TASKS\" ( \"ID\" number(19,0) not null, \"PROJECT_ID\" number(19,0) not null, \"TITLE\" varchar2(255) not null, \"DESCRIPTION\" clob null, \"STATUS\" varchar2(255) default 'todo' not null, \"ASSIGNED_TO\" number(19,0) null, \"CREATED_BY\" number(19,0) null, \"UPDATED_BY\" number(19,0) null, \"CREATED_AT\" timestamp null, \"UPDATED_AT\" timestamp null, constraint tasks_project_id_fk foreign key ( \"PROJECT_ID\" ) references \"PROJECTS\" ( \"ID\" ) on delete cascade, constraint tasks_assigned_to_fk foreign key ( \"ASSIGNED_TO\" ) references \"USERS\" ( \"ID\" ) on delete set null, constraint tasks_created_by_fk foreign key ( \"CREATED_BY\" ) references \"USERS\" ( \"ID\" ) on delete set null, constraint tasks_updated_by_fk foreign key ( \"UPDATED_BY\" ) references \"USERS\" ( \"ID\" ) on delete set null, constraint tasks_id_pk primary key ( \"ID\" ) )
+
+Bindings      : []
+
+ (Connection: oracle, Host: 127.0.0.1, Port: 1521, Database: xe, SQL: create table \"TASKS\" ( \"ID\" number(19,0) not null, \"PROJECT_ID\" number(19,0) not null, \"TITLE\" varchar2(255) not null, \"DESCRIPTION\" clob null, \"STATUS\" varchar2(255) default 'todo' not null, \"ASSIGNED_TO\" number(19,0) null, \"CREATED_BY\" number(19,0) null, \"UPDATED_BY\" number(19,0) null, \"CREATED_AT\" timestamp null, \"UPDATED_AT\" timestamp null, constraint tasks_project_id_fk foreign key ( \"PROJECT_ID\" ) references \"PROJECTS\" ( \"ID\" ) on delete cascade, constraint tasks_assigned_to_fk foreign key ( \"ASSIGNED_TO\" ) references \"USERS\" ( \"ID\" ) on delete set null, constraint tasks_created_by_fk foreign key ( \"CREATED_BY\" ) references \"USERS\" ( \"ID\" ) on delete set null, constraint tasks_updated_by_fk foreign key ( \"UPDATED_BY\" ) references \"USERS\" ( \"ID\" ) on delete set null, constraint tasks_id_pk primary key ( \"ID\" ) )) at D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838)
+[stacktrace]
+#0 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate/Database/Connection->runQueryCallback('create table \"T...', Array, Object(Closure))
+#1 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php(573): Illuminate/Database/Connection->run('create table \"T...', Array, Object(Closure))
+#2 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php(121): Illuminate/Database/Connection->statement('create table \"T...')
+#3 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php(686): Illuminate/Database/Schema/Blueprint->build()
+#4 D:/FlowBoard-ISD-Project/backend/vendor/yajra/laravel-oci8/src/Oci8/Schema/OracleBuilder.php(48): Illuminate/Database/Schema/Builder->build(Object(Yajra/Oci8/Schema/OracleBlueprint))
+#5 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(363): Yajra/Oci8/Schema/OracleBuilder->create('tasks', Object(Closure))
+#6 D:/FlowBoard-ISD-Project/backend/database/migrations/2026_06_03_061627_create_tasks_table.php(12): Illuminate/Support/Facades/Facade::__callStatic('create', Array)
+#7 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(517): Illuminate/Database/Migrations/Migration@anonymous->up()
+#8 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(442): Illuminate/Database/Migrations/Migrator->runMethod(Object(Yajra/Oci8/Oci8Connection), Object(Illuminate/Database/Migrations/Migration@anonymous), 'up')
+#9 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php(35): Illuminate/Database/Migrations/Migrator->Illuminate/Database/Migrations/{closure}(Object(Yajra/Oci8/Oci8Connection))
+#10 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(450): Illuminate/Database/Connection->transaction(Object(Closure))
+#11 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(253): Illuminate/Database/Migrations/Migrator->runMigration(Object(Illuminate/Database/Migrations/Migration@anonymous), 'up')
+#12 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Console/View/Components/Task.php(41): Illuminate/Database/Migrations/Migrator->Illuminate/Database/Migrations/{closure}()
+#13 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(814): Illuminate/Console/View/Components/Task->render('2026_06_03_0616...', Object(Closure))
+#14 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(253): Illuminate/Database/Migrations/Migrator->write('Illuminate//Cons...', '2026_06_03_0616...', Object(Closure))
+#15 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(211): Illuminate/Database/Migrations/Migrator->runUp('D://FlowBoard-IS...', 3, false)
+#16 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(138): Illuminate/Database/Migrations/Migrator->runPending(Array, Array)
+#17 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(116): Illuminate/Database/Migrations/Migrator->run(Array, Array)
+#18 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(671): Illuminate/Database/Console/Migrations/MigrateCommand->Illuminate/Database/Console/Migrations/{closure}()
+#19 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(109): Illuminate/Database/Migrations/Migrator->usingConnection(NULL, Object(Closure))
+#20 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(88): Illuminate/Database/Console/Migrations/MigrateCommand->runMigrations()
+#21 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate/Database/Console/Migrations/MigrateCommand->handle()
+#22 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate/Container/BoundMethod::Illuminate/Container/{closure}()
+#23 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(96): Illuminate/Container/Util::unwrapIfClosure(Object(Closure))
+#24 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate/Container/BoundMethod::callBoundMethod(Object(Illuminate/Foundation/Application), Array, Object(Closure))
+#25 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Container/Container.php(799): Illuminate/Container/BoundMethod::call(Object(Illuminate/Foundation/Application), Array, Array, NULL)
+#26 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Console/Command.php(211): Illuminate/Container/Container->call(Array)
+#27 D:/FlowBoard-ISD-Project/backend/vendor/symfony/console/Command/Command.php(341): Illuminate/Console/Command->execute(Object(Symfony/Component/Console/Input/ArgvInput), Object(Illuminate/Console/OutputStyle))
+#28 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Console/Command.php(180): Symfony/Component/Console/Command/Command->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Illuminate/Console/OutputStyle))
+#29 D:/FlowBoard-ISD-Project/backend/vendor/symfony/console/Application.php(1117): Illuminate/Console/Command->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#30 D:/FlowBoard-ISD-Project/backend/vendor/symfony/console/Application.php(356): Symfony/Component/Console/Application->doRunCommand(Object(Illuminate/Database/Console/Migrations/MigrateCommand), Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#31 D:/FlowBoard-ISD-Project/backend/vendor/symfony/console/Application.php(195): Symfony/Component/Console/Application->doRun(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#32 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#33 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate/Foundation/Console/Kernel->handle(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#34 D:/FlowBoard-ISD-Project/backend/artisan(16): Illuminate/Foundation/Application->handleCommand(Object(Symfony/Component/Console/Input/ArgvInput))
+#35 {main}
+
+[previous exception] [object] (Yajra\\Pdo\\Oci8\\Exceptions\\Oci8Exception(code: 955): Error Code    : 955
+
+Error Message : ORA-00955: name is already used by an existing object
+
+Position      : 13
+
+Statement     : create table \"TASKS\" ( \"ID\" number(19,0) not null, \"PROJECT_ID\" number(19,0) not null, \"TITLE\" varchar2(255) not null, \"DESCRIPTION\" clob null, \"STATUS\" varchar2(255) default 'todo' not null, \"ASSIGNED_TO\" number(19,0) null, \"CREATED_BY\" number(19,0) null, \"UPDATED_BY\" number(19,0) null, \"CREATED_AT\" timestamp null, \"UPDATED_AT\" timestamp null, constraint tasks_project_id_fk foreign key ( \"PROJECT_ID\" ) references \"PROJECTS\" ( \"ID\" ) on delete cascade, constraint tasks_assigned_to_fk foreign key ( \"ASSIGNED_TO\" ) references \"USERS\" ( \"ID\" ) on delete set null, constraint tasks_created_by_fk foreign key ( \"CREATED_BY\" ) references \"USERS\" ( \"ID\" ) on delete set null, constraint tasks_updated_by_fk foreign key ( \"UPDATED_BY\" ) references \"USERS\" ( \"ID\" ) on delete set null, constraint tasks_id_pk primary key ( \"ID\" ) )
+
+Bindings      : []
+
+ at D:/FlowBoard-ISD-Project/backend/vendor/yajra/laravel-pdo-via-oci8/src/Pdo/Oci8/Statement.php:798)
+[stacktrace]
+#0 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php(584): Yajra/Pdo/Oci8/Statement->execute()
+#1 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php(827): Illuminate/Database/Connection->Illuminate/Database/{closure}('create table \"T...', Array)
+#2 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate/Database/Connection->runQueryCallback('create table \"T...', Array, Object(Closure))
+#3 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php(573): Illuminate/Database/Connection->run('create table \"T...', Array, Object(Closure))
+#4 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php(121): Illuminate/Database/Connection->statement('create table \"T...')
+#5 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php(686): Illuminate/Database/Schema/Blueprint->build()
+#6 D:/FlowBoard-ISD-Project/backend/vendor/yajra/laravel-oci8/src/Oci8/Schema/OracleBuilder.php(48): Illuminate/Database/Schema/Builder->build(Object(Yajra/Oci8/Schema/OracleBlueprint))
+#7 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(363): Yajra/Oci8/Schema/OracleBuilder->create('tasks', Object(Closure))
+#8 D:/FlowBoard-ISD-Project/backend/database/migrations/2026_06_03_061627_create_tasks_table.php(12): Illuminate/Support/Facades/Facade::__callStatic('create', Array)
+#9 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(517): Illuminate/Database/Migrations/Migration@anonymous->up()
+#10 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(442): Illuminate/Database/Migrations/Migrator->runMethod(Object(Yajra/Oci8/Oci8Connection), Object(Illuminate/Database/Migrations/Migration@anonymous), 'up')
+#11 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php(35): Illuminate/Database/Migrations/Migrator->Illuminate/Database/Migrations/{closure}(Object(Yajra/Oci8/Oci8Connection))
+#12 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(450): Illuminate/Database/Connection->transaction(Object(Closure))
+#13 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(253): Illuminate/Database/Migrations/Migrator->runMigration(Object(Illuminate/Database/Migrations/Migration@anonymous), 'up')
+#14 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Console/View/Components/Task.php(41): Illuminate/Database/Migrations/Migrator->Illuminate/Database/Migrations/{closure}()
+#15 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(814): Illuminate/Console/View/Components/Task->render('2026_06_03_0616...', Object(Closure))
+#16 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(253): Illuminate/Database/Migrations/Migrator->write('Illuminate//Cons...', '2026_06_03_0616...', Object(Closure))
+#17 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(211): Illuminate/Database/Migrations/Migrator->runUp('D://FlowBoard-IS...', 3, false)
+#18 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(138): Illuminate/Database/Migrations/Migrator->runPending(Array, Array)
+#19 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(116): Illuminate/Database/Migrations/Migrator->run(Array, Array)
+#20 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(671): Illuminate/Database/Console/Migrations/MigrateCommand->Illuminate/Database/Console/Migrations/{closure}()
+#21 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(109): Illuminate/Database/Migrations/Migrator->usingConnection(NULL, Object(Closure))
+#22 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(88): Illuminate/Database/Console/Migrations/MigrateCommand->runMigrations()
+#23 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate/Database/Console/Migrations/MigrateCommand->handle()
+#24 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate/Container/BoundMethod::Illuminate/Container/{closure}()
+#25 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(96): Illuminate/Container/Util::unwrapIfClosure(Object(Closure))
+#26 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate/Container/BoundMethod::callBoundMethod(Object(Illuminate/Foundation/Application), Array, Object(Closure))
+#27 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Container/Container.php(799): Illuminate/Container/BoundMethod::call(Object(Illuminate/Foundation/Application), Array, Array, NULL)
+#28 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Console/Command.php(211): Illuminate/Container/Container->call(Array)
+#29 D:/FlowBoard-ISD-Project/backend/vendor/symfony/console/Command/Command.php(341): Illuminate/Console/Command->execute(Object(Symfony/Component/Console/Input/ArgvInput), Object(Illuminate/Console/OutputStyle))
+#30 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Console/Command.php(180): Symfony/Component/Console/Command/Command->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Illuminate/Console/OutputStyle))
+#31 D:/FlowBoard-ISD-Project/backend/vendor/symfony/console/Application.php(1117): Illuminate/Console/Command->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#32 D:/FlowBoard-ISD-Project/backend/vendor/symfony/console/Application.php(356): Symfony/Component/Console/Application->doRunCommand(Object(Illuminate/Database/Console/Migrations/MigrateCommand), Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#33 D:/FlowBoard-ISD-Project/backend/vendor/symfony/console/Application.php(195): Symfony/Component/Console/Application->doRun(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#34 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#35 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate/Foundation/Console/Kernel->handle(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#36 D:/FlowBoard-ISD-Project/backend/artisan(16): Illuminate/Foundation/Application->handleCommand(Object(Symfony/Component/Console/Input/ArgvInput))
+#37 {main}
+"} 
