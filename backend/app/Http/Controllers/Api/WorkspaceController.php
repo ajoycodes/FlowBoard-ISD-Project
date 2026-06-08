@@ -205,6 +205,6 @@ class WorkspaceController extends Controller
 
     private function userIsWorkspaceOwner(int $userId, Workspace $workspace): bool
     {
-        return $workspace->owner_id === $userId;
+        return $workspace->owner_id == $userId;
     }
 }
