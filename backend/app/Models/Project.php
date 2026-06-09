@@ -27,11 +27,16 @@ class Project extends Model
         'name',
         'description',
         'status',
+        'created by'
     ];
 
     public function workspace()
     {
         return $this->belongsTo(Workspace::class);
+    }
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function tasks()

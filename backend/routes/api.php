@@ -5,7 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\WorkspaceController;
-
+use App\Http\Controllers\Api\ProjectController;
 
 Route::post('/register', [AuthController::class, 'register']);
 
@@ -26,4 +26,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/workspaces/{workspace}', [WorkspaceController::class, 'update']);
     Route::delete('/workspaces/{workspace}', [WorkspaceController::class, 'destroy']);
     Route::post('/workspaces/{workspace}/tasks', [TaskController::class, 'store']);
+    Route::get('/projects', [ProjectController::class, 'index']);
+    Route::post('/projects', [ProjectController::class, 'store']);
+    Route::get('/projects/{project}', [ProjectController::class, 'show']);
+    Route::put('/projects/{project}', [ProjectController::class, 'update']);
+    Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
 });
