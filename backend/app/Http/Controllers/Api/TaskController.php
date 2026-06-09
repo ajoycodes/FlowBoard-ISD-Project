@@ -7,9 +7,13 @@ use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class TaskController extends Controller
 {
+    /**
+     * Create a new task
+     */
     public function store(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -24,6 +28,7 @@ class TaskController extends Controller
             'deadline' => ['nullable', 'date'],
         ]);
 
+        // Check if user belongs to workspace of the project
         $project = Project::query()
             ->with('workspace')
             ->where('id', $validated['project_id'])
@@ -39,6 +44,7 @@ class TaskController extends Controller
             ], 403);
         }
 
+        // Check if assigned_to user belongs to workspace
         if (! empty($validated['assigned_to'])) {
             $isAssigneeWorkspaceMember = $project->workspace
                 ->members()
@@ -53,6 +59,7 @@ class TaskController extends Controller
             }
         }
 
+        // Create task
         $task = Task::create([
             'workspace_id' => $project->workspace_id,
             'project_id' => $project->id,
@@ -71,29 +78,13 @@ class TaskController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Task created successfully.',
-            'data' => [
-                'id' => $task->id,
-                'workspace_id' => $task->workspace_id,
-                'project_id' => $task->project_id,
-                'title' => $task->title,
-                'description' => $task->description,
-                'status' => $task->status,
-                'priority' => $task->priority,
-                'deadline' => $task->deadline,
-                'assigned_to' => $task->assigned_to,
-                'created_by' => $task->created_by,
-                'updated_by' => $task->updated_by,
-                'project' => $task->project ? [
-                    'id' => $task->project->id,
-                    'name' => $task->project->name,
-                    'workspace_id' => $task->project->workspace_id,
-                ] : null,
-                'created_at' => $task->created_at,
-                'updated_at' => $task->updated_at,
-            ],
+            'data' => $task,
         ], 201);
     }
 
+    /**
+     * Full update of task (title, description, assigned_to, priority, deadline, status)
+     */
     public function update(Request $request, Task $task): JsonResponse
     {
         $user = $request->user();
@@ -120,6 +111,7 @@ class TaskController extends Controller
             'deadline' => ['nullable', 'date'],
         ]);
 
+        // Check assigned_to membership
         if (! empty($validated['assigned_to'])) {
             $isAssigneeWorkspaceMember = $task->workspace
                 ->members()
@@ -134,23 +126,14 @@ class TaskController extends Controller
             }
         }
 
+        // Update task
         $task->update([
-            'assigned_to' => array_key_exists('assigned_to', $validated)
-                ? $validated['assigned_to']
-                : $task->assigned_to,
-
+            'assigned_to' => array_key_exists('assigned_to', $validated) ? $validated['assigned_to'] : $task->assigned_to,
             'title' => $validated['title'] ?? $task->title,
-            'description' => array_key_exists('description', $validated)
-                ? $validated['description']
-                : $task->description,
-
+            'description' => array_key_exists('description', $validated) ? $validated['description'] : $task->description,
             'status' => $validated['status'] ?? $task->status,
             'priority' => $validated['priority'] ?? $task->priority,
-
-            'deadline' => array_key_exists('deadline', $validated)
-                ? $validated['deadline']
-                : $task->deadline,
-
+            'deadline' => array_key_exists('deadline', $validated) ? $validated['deadline'] : $task->deadline,
             'updated_by' => $user->id,
         ]);
 
@@ -159,26 +142,34 @@ class TaskController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Task updated successfully.',
-            'data' => [
-                'id' => $task->id,
-                'workspace_id' => $task->workspace_id,
-                'project_id' => $task->project_id,
-                'title' => $task->title,
-                'description' => $task->description,
-                'status' => $task->status,
-                'priority' => $task->priority,
-                'deadline' => $task->deadline,
-                'assigned_to' => $task->assigned_to,
-                'created_by' => $task->created_by,
-                'updated_by' => $task->updated_by,
-                'project' => $task->project ? [
-                    'id' => $task->project->id,
-                    'name' => $task->project->name,
-                    'workspace_id' => $task->project->workspace_id,
-                ] : null,
-                'created_at' => $task->created_at,
-                'updated_at' => $task->updated_at,
-            ],
+            'data' => $task,
+        ]);
+    }
+
+    /**
+     * Update only task status
+     */
+    public function updateStatus(Request $request, Task $task): JsonResponse
+    {
+        $user = $request->user();
+
+        if (! $task->workspace->members()->where('users.id', $user->id)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Not authorized to update this task.',
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'status' => ['required', Rule::in(['todo','in_progress','done'])]
+        ]);
+
+        $task->update(['status' => $validated['status']]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Task status updated successfully',
+            'data' => $task->fresh()
         ]);
     }
 }

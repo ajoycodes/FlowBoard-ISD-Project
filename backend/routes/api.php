@@ -19,9 +19,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::post('/tasks', [TaskController::class, 'store']);
     Route::put('/tasks/{task}', [TaskController::class, 'update']);
+    Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus']);
     Route::get('/workspaces', [WorkspaceController::class, 'index']);
     Route::post('/workspaces', [WorkspaceController::class, 'store']);
     Route::get('/workspaces/{workspace}', [WorkspaceController::class, 'show']);
     Route::put('/workspaces/{workspace}', [WorkspaceController::class, 'update']);
     Route::delete('/workspaces/{workspace}', [WorkspaceController::class, 'destroy']);
+    Route::post('/workspaces/{workspace}/tasks', [TaskController::class, 'store']);
 });
