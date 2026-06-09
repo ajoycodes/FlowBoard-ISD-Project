@@ -17,13 +17,11 @@ class ActivityLog extends Model
 
     protected $fillable = [
         'workspace_id',
-        'actor_id',
-        'event_type',
+        'user_id',
+        'action',
+        'entity_type',
+        'entity_id',
         'description',
-        'subject_type',
-        'subject_id',
-        'subject_title',
-        'metadata',
     ];
 
     public function workspace()
@@ -31,8 +29,8 @@ class ActivityLog extends Model
         return $this->belongsTo(Workspace::class);
     }
 
-    public function actor()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'actor_id');
+        return $this->belongsTo(User::class);
     }
 }
