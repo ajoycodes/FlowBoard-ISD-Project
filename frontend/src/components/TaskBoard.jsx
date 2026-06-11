@@ -1,0 +1,404 @@
+import React, { useEffect, useState } from 'react'
+import { getTasks, createTask, updateTask, deleteTask } from '../lib/api'
+import './TaskBoard.css'
+
+// ── Constants ──────────────────────────────────────────────────────
+const COLUMNS = ['To Do', 'In Progress', 'Done']
+
+const FILTER_TABS = ['All Tasks', 'Assigned to Me', 'High Priority', 'In Progress', 'Completed']
+
+const currentUser = localStorage.getItem('username') || ''
+const [tasks, setTasks] = useState([])
+const [loading, setLoading] = useState(false)
+const [error, setError] = useState('')
+
+// ── Helpers ────────────────────────────────────────────────────────
+function priorityClass(priority) {
+  const p = (priority || '').toLowerCase()
+  if (p === 'high')   return 'task-badge priority-high'
+  if (p === 'medium') return 'task-badge priority-medium'
+  return 'task-badge priority-low'
+}
+
+function fmtDate(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  return isNaN(d) ? dateStr : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+function initials(name) {
+  return (name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
+}
+
+function applyFilter(tasks, tab, search, currentUser) {
+  let result = [...tasks]
+
+  if (tab === 'Assigned to Me') {
+    result = result.filter(t => t.assignee === currentUser)
+  }
+
+  if (tab === 'High Priority') result = result.filter(t => (t.priority || '').toLowerCase() === 'high')
+  if (tab === 'In Progress') result = result.filter(t => t.status === 'In Progress')
+  if (tab === 'Completed') result = result.filter(t => t.status === 'Done')
+
+  if (search.trim()) {
+    const q = search.trim().toLowerCase()
+    result = result.filter(t =>
+      t.title.toLowerCase().includes(q) ||
+      (t.assignee || '').toLowerCase().includes(q) ||
+      (t.priority || '').toLowerCase().includes(q)
+    )
+  }
+
+  return result
+}
+
+const visibleTasks = applyFilter(tasks, activeTab, search, currentUser)
+
+useEffect(() => {
+  async function loadTasks() {
+    try {
+      setLoading(true)
+      setError('')
+
+      const result = await getTasks(workspaceId)
+      setTasks(result.data || result)
+    } catch (error) {
+      setError(error.message || 'Failed to load tasks.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (workspaceId) loadTasks()
+}, [workspaceId])
+
+// ── Add Task Modal ─────────────────────────────────────────────────
+const EMPTY_FORM = { title: '', description: '', priority: 'Medium', deadline: '', assignee: '' }
+
+function AddTaskModal({ defaultStatus, onClose, onAdd }) {
+  const [form, setForm] = useState({ ...EMPTY_FORM, status: defaultStatus || 'To Do' })
+  const [error, setError] = useState('')
+
+  const set = (key, val) => setForm(f => ({ ...f, [key]: val }))
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (!form.title.trim()) { setError('Task title is required.'); return }
+    onAdd({ ...form, title: form.title.trim() })
+  }
+
+  return (
+    <div className="task-modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="task-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <h2 id="modal-title" className="task-modal-title">Add New Task</h2>
+
+        <form className="stack" onSubmit={handleSubmit} noValidate>
+
+          <div className="form-group">
+            <label htmlFor="tb-title">Task title</label>
+            <input
+              id="tb-title"
+              type="text"
+              value={form.title}
+              onChange={e => { set('title', e.target.value); setError('') }}
+              placeholder="e.g. Build auth middleware"
+              autoFocus
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="tb-desc">Description</label>
+            <textarea
+              id="tb-desc"
+              rows={3}
+              value={form.description}
+              onChange={e => set('description', e.target.value)}
+              placeholder="Optional details..."
+              className="task-modal-textarea"
+            />
+          </div>
+
+          <div className="task-modal-row">
+            <div className="form-group">
+              <label htmlFor="tb-priority">Priority</label>
+              <select
+                id="tb-priority"
+                value={form.priority}
+                onChange={e => set('priority', e.target.value)}
+                className="task-modal-select"
+              >
+                <option>High</option>
+                <option>Medium</option>
+                <option>Low</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="tb-status">Column</label>
+              <select
+                id="tb-status"
+                value={form.status}
+                onChange={e => set('status', e.target.value)}
+                className="task-modal-select"
+              >
+                {COLUMNS.map(c => <option key={c}>{c}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="task-modal-row">
+            <div className="form-group">
+              <label htmlFor="tb-deadline">Deadline</label>
+              <input
+                id="tb-deadline"
+                type="date"
+                value={form.deadline}
+                onChange={e => set('deadline', e.target.value)}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="tb-assignee">Assignee</label>
+              <input
+                id="tb-assignee"
+                type="text"
+                value={form.assignee}
+                onChange={e => set('assignee', e.target.value)}
+                placeholder="e.g. Fariha"
+              />
+            </div>
+          </div>
+
+          {error && <p className="hint task-modal-error">{error}</p>}
+
+          <div className="task-modal-actions">
+            <button type="submit"  className="primary-btn">Create Task</button>
+            <button type="button"  className="ghost-btn"   onClick={onClose}>Cancel</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  )
+}
+
+// ── Task Card ──────────────────────────────────────────────────────
+function TaskCard({ task, onMove, onDelete }) {
+  const nextStatus = task.status === 'To Do' ? 'In Progress'
+    : task.status === 'In Progress' ? 'Done'
+    : null
+
+  const prevStatus = task.status === 'Done' ? 'In Progress'
+    : task.status === 'In Progress' ? 'To Do'
+    : null
+
+  return (
+    <div className="task-card">
+      <p className="task-title">{task.title}</p>
+
+      <div className="task-badges">
+        <span className={priorityClass(task.priority)}>{task.priority || 'Low'}</span>
+        <span className="task-badge task-badge-assignee">{initials(task.assignee)}</span>
+      </div>
+
+      {task.deadline && (
+        <p className="task-deadline">Due {fmtDate(task.deadline)}</p>
+      )}
+
+      <div className="task-actions">
+        {prevStatus && (
+          <button
+            className="task-btn"
+            onClick={() => onMove(task.id, prevStatus)}
+            title={`Move to ${prevStatus}`}
+          >
+            ← {prevStatus}
+          </button>
+        )}
+        {nextStatus && (
+          <button
+            className="task-btn task-btn-advance"
+            onClick={() => onMove(task.id, nextStatus)}
+            title={`Move to ${nextStatus}`}
+          >
+            {nextStatus} →
+          </button>
+        )}
+        <button
+          className="task-btn task-btn-delete"
+          onClick={() => window.confirm('Delete this task?') && onDelete(task.id)}
+          title="Delete task"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ── Main Component ─────────────────────────────────────────────────
+export default function TaskBoard({ workspaceId, onNavigate }) {
+  const [tasks,       setTasks]       = useState(INITIAL_TASKS)
+  const [activeTab,   setActiveTab]   = useState('All Tasks')
+  const [search,      setSearch]      = useState('')
+  const [modal,       setModal]       = useState(null) // null | column-name string
+
+  const visibleTasks = applyFilter(tasks, activeTab, search)
+
+  const handleAdd = async (newTask) => {
+  try {
+    const result = await createTask(workspaceId, newTask)
+    setTasks(prev => [...prev, result.data || result])
+    setModal(null)
+  } catch (error) {
+    setError(error.message || 'Failed to create task.')
+  }
+}
+
+  const handleMove = async (id, newStatus) => {
+  try {
+    const result = await updateTask(id, { status: newStatus })
+    const updatedTask = result.data || result
+
+    setTasks(prev => prev.map(t => t.id === id ? updatedTask : t))
+  } catch (error) {
+    setError(error.message || 'Failed to update task.')
+  }
+}
+
+  const handleDelete = async (id) => {
+  try {
+    await deleteTask(id)
+    setTasks(prev => prev.filter(t => t.id !== id))
+  } catch (error) {
+    setError(error.message || 'Failed to delete task.')
+  }
+}
+
+  const wsName = `Workspace #${workspaceId ?? 1}`
+
+  return (
+    <div className="board-page">
+
+      {/* ── Navbar ── */}
+      <nav className="board-navbar">
+        <span className="board-brand">FlowBoard</span>
+        <div className="board-navbar-right">
+          <button
+            className="board-nav-pill board-nav-pill--workspace"
+            onClick={() => onNavigate && onNavigate('dashboard')}
+          >
+            ← Dashboard
+          </button>
+          <button
+            className="board-nav-pill"
+            onClick={() => onNavigate && onNavigate('activity', workspaceId)}
+          >
+            Activity Log
+          </button>
+        </div>
+      </nav>
+
+      {/* ── Page content ── */}
+      <div className="board-content">
+
+        {/* Breadcrumb */}
+        <p className="board-breadcrumb">FlowBoard &rsaquo; {wsName} &rsaquo; Board</p>
+
+        {/* ── Filter / Tabs bar ── */}
+        <div className="board-filter-bar">
+          <div className="board-filter-top">
+
+            {/* Tabs */}
+            <div className="board-tabs" role="tablist">
+              {FILTER_TABS.map(tab => (
+                <button
+                  key={tab}
+                  role="tab"
+                  aria-selected={activeTab === tab}
+                  className={`board-tab${activeTab === tab ? ' board-tab--active' : ''}`}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+
+            {/* Add Task button */}
+            <button
+              className="board-add-task-btn"
+              onClick={() => setModal('To Do')}
+            >
+              + Add Task
+            </button>
+
+          </div>
+
+          {/* Search */}
+          <div className="board-search-row">
+            <input
+              type="search"
+              className="board-search"
+              placeholder="Search tasks by title, assignee or priority..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              aria-label="Search tasks"
+            />
+          </div>
+        </div>
+
+        {/* ── Kanban columns ── */}
+        <div className="board-columns">
+          {COLUMNS.map(col => {
+            const colTasks = visibleTasks.filter(t => t.status === col)
+            return (
+              <div key={col} className="board-column">
+
+                {/* Column header */}
+                <div className="board-column-header">
+                  <span className="board-column-title">{col}</span>
+                  <span className="board-column-count">{colTasks.length}</span>
+                </div>
+
+                {/* Task cards */}
+                <div className="board-column-cards">
+                  {colTasks.length === 0 ? (
+                    <p className="board-column-empty">No tasks here.</p>
+                  ) : (
+                    colTasks.map(task => (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        onMove={handleMove}
+                        onDelete={handleDelete}
+                      />
+                    ))
+                  )}
+                </div>
+
+                {/* Add task from column footer */}
+                <button
+                  className="board-col-add-btn"
+                  onClick={() => setModal(col)}
+                >
+                  + Add Task
+                </button>
+
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* ── Modal ── */}
+      {modal && (
+        <AddTaskModal
+          defaultStatus={modal}
+          onClose={() => setModal(null)}
+          onAdd={handleAdd}
+        />
+      )}
+    </div>
+  )
+}

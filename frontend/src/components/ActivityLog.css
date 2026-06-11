@@ -1,0 +1,301 @@
+/* ══════════════════════════════════════════════
+   ActivityLog
+   ══════════════════════════════════════════════ */
+
+.al-heading {
+  margin: 0 0 1.25rem;
+  color: #111827;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+/* ── Two-column body ──────────────────────────── */
+.al-body {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+/* ── Left: task navigation panel ─────────────── */
+.al-task-nav {
+  background: #FFFFFF;
+  border: 1px solid #9CA3AF;
+  border-radius: 12px;
+  padding: 1rem;
+  position: sticky;
+  top: calc(88px + 1.75rem); /* navbar height + dl-main padding */
+}
+
+.al-task-nav-label {
+  margin: 0 0 .6rem;
+  font-size: .72rem;
+  font-weight: 700;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: 0 .5rem;
+}
+
+.al-task-divider {
+  height: 1px;
+  background: #E5E7EB;
+  margin: .5rem 0;
+}
+
+/* Task nav button */
+.al-task-btn {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .5rem;
+  width: 100%;
+  padding: .6rem .75rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #374151;
+  font-size: .85rem;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background .13s, color .13s;
+  margin-bottom: .15rem;
+}
+.al-task-btn:hover { background: #F3F4F6; color: #111827; }
+.al-task-btn--active {
+  background: #EEF5FF;
+  color: #1E40AF;
+  font-weight: 600;
+}
+
+.al-task-btn-title {
+  flex: 1;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+/* Count badge (for "All Activity") */
+.al-task-btn-count {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: #E5E7EB;
+  border: 1px solid #9CA3AF;
+  font-size: .72rem;
+  font-weight: 700;
+  color: #374151;
+  margin-top: 2px;
+}
+
+/* Status dot badge (for individual tasks) */
+.al-task-status-dot {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 10px;
+  font-size: .68rem;
+  font-weight: 600;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+/* ── Right: activity content ──────────────────── */
+.al-content { min-width: 0; }
+
+.al-content-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: .75rem;
+}
+
+.al-sub-heading {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* ── Filter bar ───────────────────────────────── */
+.al-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+}
+
+.al-date-input {
+  padding: .5rem .8rem;
+  border: 1px solid #9CA3AF;
+  border-radius: 8px;
+  background: #FFFFFF;
+  font-size: .875rem;
+  color: #111827;
+  font-family: inherit;
+  transition: border-color .15s, box-shadow .15s;
+}
+.al-date-input:focus {
+  outline: none;
+  border-color: #6B7280;
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, .15);
+}
+
+.al-btn { font-size: .85rem; padding: .45rem .9rem; }
+
+/* ── Task meta chips ──────────────────────────── */
+.al-task-meta {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+  margin-bottom: .85rem;
+}
+
+.al-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  height: 26px;
+  padding: 0 .7rem;
+  border-radius: 13px;
+  border: 1px solid #9CA3AF;
+  background: #F3F4F6;
+  font-size: .78rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.al-meta-assignee {
+  background: #DBEAFE;
+  color: #1E40AF;
+  border-color: #BFDBFE;
+}
+
+/* ── Activity list ────────────────────────────── */
+.al-list {
+  background: #FFFFFF;
+  border: 1px solid #9CA3AF;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Headers — 3-col (single task) or 4-col (all tasks) */
+.al-list-header {
+  display: grid;
+  grid-template-columns: 1fr 140px 175px;
+  gap: 1rem;
+  padding: .7rem 1.1rem;
+  border-bottom: 1px solid #D1D5DB;
+  font-size: .75rem;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  background: #F9FAFB;
+}
+
+/* Rows */
+.al-row {
+  display: grid;
+  grid-template-columns: 1fr 140px 175px;
+  gap: 1rem;
+  align-items: center;
+  padding: .8rem 1.1rem;
+  border-bottom: 1px solid #E5E7EB;
+  background: #FFFFFF;
+}
+.al-row:last-child { border-bottom: none; }
+.al-row--alt       { background: #F9FAFB; }
+
+/* Four-column layout when viewing "All Activity" */
+.al-list-header:has(.al-col-task),
+.al-row--wide {
+  grid-template-columns: 1fr 160px 120px 175px;
+}
+
+.al-row-action {
+  font-weight: 500;
+  color: #111827;
+  font-size: .875rem;
+}
+
+.al-row-task {
+  font-size: .8rem;
+  color: #4B5563;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.al-row-user {
+  display: inline-flex;
+  align-items: center;
+  font-size: .8rem;
+  color: #4B5563;
+  border: 1px solid #9CA3AF;
+  border-radius: 13.5px;
+  background: #FFFFFF;
+  padding: .2rem .6rem;
+  white-space: nowrap;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.al-row-time {
+  font-size: .8rem;
+  color: #6B7280;
+  white-space: nowrap;
+}
+
+/* ── Empty state ──────────────────────────────── */
+.al-empty {
+  padding: 2.5rem;
+  text-align: center;
+  color: #6B7280;
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  border-radius: 12px;
+}
+
+/* ── Responsive ───────────────────────────────── */
+@media (max-width: 900px) {
+  .al-body { grid-template-columns: 180px 1fr; }
+}
+
+@media (max-width: 700px) {
+  .al-body { grid-template-columns: 1fr; }
+
+  .al-task-nav {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    padding: .75rem;
+  }
+  .al-task-nav-label { width: 100%; margin-bottom: .2rem; }
+  .al-task-divider   { display: none; }
+  .al-task-btn       { width: auto; padding: .4rem .75rem; flex-direction: row; }
+  .al-task-btn-title { font-size: .8rem; }
+  .al-task-status-dot{ display: none; }
+
+  .al-list-header,
+  .al-row { grid-template-columns: 1fr; gap: .3rem; }
+  .al-list-header { display: none; }
+  .al-row--wide { grid-template-columns: 1fr; }
+  .al-col-task  { display: none; }
+  .al-row-task  { display: none; }
+  .al-row-time  { color: #9CA3AF; font-size: .75rem; }
+
+  .al-content-header { flex-direction: column; align-items: flex-start; }
+  .al-filter-bar     { width: 100%; }
+  .al-date-input     { flex: 1; }
+}
