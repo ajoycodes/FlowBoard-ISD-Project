@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { getTasks, createTask, updateTask, deleteTask } from '../lib/api'
 import './TaskBoard.css'
 
 // ── Constants ──────────────────────────────────────────────────────
@@ -6,16 +7,10 @@ const COLUMNS = ['To Do', 'In Progress', 'Done']
 
 const FILTER_TABS = ['All Tasks', 'Assigned to Me', 'High Priority', 'In Progress', 'Completed']
 
-const CURRENT_USER = 'Fariha' // replace with real auth user when backend connected
-
-const INITIAL_TASKS = [
-  { id: 1, title: 'Activity log API endpoint',  priority: 'Medium', deadline: '2026-06-10', assignee: 'Dev 3',  status: 'To Do'      },
-  { id: 2, title: 'Write unit tests',            priority: 'Low',    deadline: '2026-06-15', assignee: 'Dev 2',  status: 'To Do'      },
-  { id: 3, title: 'Design dashboard UI',         priority: 'High',   deadline: '2026-06-05', assignee: 'Fariha', status: 'In Progress' },
-  { id: 4, title: 'Set up Oracle schema',        priority: 'Medium', deadline: '2026-05-28', assignee: 'Dev 2',  status: 'In Progress' },
-  { id: 5, title: 'Implement login page',        priority: 'High',   deadline: '2026-06-01', assignee: 'Fariha', status: 'Done'        },
-  { id: 6, title: 'Configure Vite project',      priority: 'Low',    deadline: '2026-05-20', assignee: 'Dev 3',  status: 'Done'        },
-]
+const currentUser = localStorage.getItem('username') || ''
+const [tasks, setTasks] = useState([])
+const [loading, setLoading] = useState(false)
+const [error, setError] = useState('')
 
 // ── Helpers ────────────────────────────────────────────────────────
 function priorityClass(priority) {
@@ -35,12 +30,17 @@ function initials(name) {
   return (name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
 }
 
-function applyFilter(tasks, tab, search) {
+function applyFilter(tasks, tab, search, currentUser) {
   let result = [...tasks]
-  if (tab === 'Assigned to Me')  result = result.filter(t => t.assignee === CURRENT_USER)
-  if (tab === 'High Priority')   result = result.filter(t => (t.priority || '').toLowerCase() === 'high')
-  if (tab === 'In Progress')     result = result.filter(t => t.status === 'In Progress')
-  if (tab === 'Completed')       result = result.filter(t => t.status === 'Done')
+
+  if (tab === 'Assigned to Me') {
+    result = result.filter(t => t.assignee === currentUser)
+  }
+
+  if (tab === 'High Priority') result = result.filter(t => (t.priority || '').toLowerCase() === 'high')
+  if (tab === 'In Progress') result = result.filter(t => t.status === 'In Progress')
+  if (tab === 'Completed') result = result.filter(t => t.status === 'Done')
+
   if (search.trim()) {
     const q = search.trim().toLowerCase()
     result = result.filter(t =>
@@ -49,8 +49,29 @@ function applyFilter(tasks, tab, search) {
       (t.priority || '').toLowerCase().includes(q)
     )
   }
+
   return result
 }
+
+const visibleTasks = applyFilter(tasks, activeTab, search, currentUser)
+
+useEffect(() => {
+  async function loadTasks() {
+    try {
+      setLoading(true)
+      setError('')
+
+      const result = await getTasks(workspaceId)
+      setTasks(result.data || result)
+    } catch (error) {
+      setError(error.message || 'Failed to load tasks.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (workspaceId) loadTasks()
+}, [workspaceId])
 
 // ── Add Task Modal ─────────────────────────────────────────────────
 const EMPTY_FORM = { title: '', description: '', priority: 'Medium', deadline: '', assignee: '' }
@@ -64,7 +85,7 @@ function AddTaskModal({ defaultStatus, onClose, onAdd }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!form.title.trim()) { setError('Task title is required.'); return }
-    onAdd({ ...form, title: form.title.trim(), id: Date.now() })
+    onAdd({ ...form, title: form.title.trim() })
   }
 
   return (
@@ -225,18 +246,35 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
 
   const visibleTasks = applyFilter(tasks, activeTab, search)
 
-  const handleAdd = (newTask) => {
-    setTasks(prev => [...prev, newTask])
+  const handleAdd = async (newTask) => {
+  try {
+    const result = await createTask(workspaceId, newTask)
+    setTasks(prev => [...prev, result.data || result])
     setModal(null)
+  } catch (error) {
+    setError(error.message || 'Failed to create task.')
   }
+}
 
-  const handleMove = (id, newStatus) => {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t))
+  const handleMove = async (id, newStatus) => {
+  try {
+    const result = await updateTask(id, { status: newStatus })
+    const updatedTask = result.data || result
+
+    setTasks(prev => prev.map(t => t.id === id ? updatedTask : t))
+  } catch (error) {
+    setError(error.message || 'Failed to update task.')
   }
+}
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
+  try {
+    await deleteTask(id)
     setTasks(prev => prev.filter(t => t.id !== id))
+  } catch (error) {
+    setError(error.message || 'Failed to delete task.')
   }
+}
 
   const wsName = `Workspace #${workspaceId ?? 1}`
 
