@@ -312,6 +312,39 @@
   justify-content: center;
 }
 
+.task-assignee-field {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 .45rem;
+  color: #6B7280;
+  font-size: .72rem;
+  font-weight: 600;
+}
+
+.task-assignee-select {
+  width: 100%;
+  height: 30px;
+  min-width: 0;
+  padding: 0 .55rem;
+  border: 1px solid #BFDBFE;
+  border-radius: 6px;
+  background: #FFFFFF;
+  color: #1E40AF;
+  font-size: .75rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+.task-assignee-select:hover { background: #EEF5FF; }
+.task-assignee-select:focus {
+  outline: none;
+  border-color: #60A5FA;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, .2);
+}
+
 /* Deadline text */
 .task-deadline {
   margin: 0 0 .4rem;
