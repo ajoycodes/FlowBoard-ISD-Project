@@ -235,10 +235,11 @@ function TaskCard({ task, assigneeOptions, onAssign, onMove, onDelete }) {
         )}
         <button
           className="task-btn task-btn-delete"
-          onClick={() => window.confirm('Delete this task?') && onDelete(task.id)}
+          onClick={() => window.confirm(`Delete "${task.title}"?`) && onDelete(task.id)}
           title="Delete task"
+          aria-label={`Delete ${task.title}`}
         >
-          X
+          Delete
         </button>
       </div>
     </div>

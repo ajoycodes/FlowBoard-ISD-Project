@@ -384,7 +384,9 @@
   border-color: #FCA5A5;
   color: #DC2626;
   background: #FEF2F2;
+  font-weight: 700;
   margin-left: auto;
+  padding-inline: 10px;
 }
 .task-btn-delete:hover { background: #FEE2E2; }
 
