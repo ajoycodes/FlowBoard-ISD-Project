@@ -90,6 +90,14 @@ export default function DashboardLayout({ children, activeNav, onNavigate, works
               Activity
             </button>
 
+            <button
+              className={`dl-navlink${activeNav === 'notes' ? ' dl-navlink--active' : ''}`}
+              onClick={() => onNavigate('notes', wsId)}
+            >
+              <span className="dl-navicon" aria-hidden="true">&#9998;</span>
+              Notes
+            </button>
+
           </nav>
         </aside>
 
