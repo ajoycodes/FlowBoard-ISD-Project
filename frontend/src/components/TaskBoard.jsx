@@ -10,12 +10,60 @@ const CURRENT_USER = localStorage.getItem('username') || 'Fariha'
 const DEFAULT_ASSIGNEES = ['Fariha', 'Dev 2', 'Dev 3']
 
 const INITIAL_TASKS = [
-  { id: 1, title: 'Activity log API endpoint', priority: 'Medium', deadline: '2026-06-10', assignee: 'Dev 3', status: 'To Do' },
-  { id: 2, title: 'Write unit tests', priority: 'Low', deadline: '2026-06-15', assignee: 'Dev 2', status: 'To Do' },
-  { id: 3, title: 'Design dashboard UI', priority: 'High', deadline: '2026-06-05', assignee: 'Fariha', status: 'In Progress' },
-  { id: 4, title: 'Set up Oracle schema', priority: 'Medium', deadline: '2026-05-28', assignee: 'Dev 2', status: 'In Progress' },
-  { id: 5, title: 'Implement login page', priority: 'High', deadline: '2026-06-01', assignee: 'Fariha', status: 'Done' },
-  { id: 6, title: 'Configure Vite project', priority: 'Low', deadline: '2026-05-20', assignee: 'Dev 3', status: 'Done' },
+  {
+    id: 1,
+    title: 'Activity log API endpoint',
+    description: 'Return workspace activity with actor, action, and timestamp fields.',
+    priority: 'Medium',
+    deadline: '2026-06-10',
+    assignee: 'Dev 3',
+    status: 'To Do',
+  },
+  {
+    id: 2,
+    title: 'Write unit tests',
+    description: 'Cover task creation, update, status movement, and deletion cases.',
+    priority: 'Low',
+    deadline: '2026-06-15',
+    assignee: 'Dev 2',
+    status: 'To Do',
+  },
+  {
+    id: 3,
+    title: 'Design dashboard UI',
+    description: 'Match the dashboard wireframe and keep project cards easy to scan.',
+    priority: 'High',
+    deadline: '2026-06-05',
+    assignee: 'Fariha',
+    status: 'In Progress',
+  },
+  {
+    id: 4,
+    title: 'Set up Oracle schema',
+    description: 'Create workspace, task, note, member, and activity log tables.',
+    priority: 'Medium',
+    deadline: '2026-05-28',
+    assignee: 'Dev 2',
+    status: 'In Progress',
+  },
+  {
+    id: 5,
+    title: 'Implement login page',
+    description: 'Connect login form validation with the auth flow.',
+    priority: 'High',
+    deadline: '2026-06-01',
+    assignee: 'Fariha',
+    status: 'Done',
+  },
+  {
+    id: 6,
+    title: 'Configure Vite project',
+    description: 'Prepare the React app shell, scripts, and initial project structure.',
+    priority: 'Low',
+    deadline: '2026-05-20',
+    assignee: 'Dev 3',
+    status: 'Done',
+  },
 ]
 
 function priorityClass(priority) {
@@ -190,6 +238,10 @@ function TaskCard({ task, assigneeOptions, onAssign, onMove, onDelete }) {
   return (
     <div className="task-card">
       <p className="task-title">{task.title}</p>
+
+      {task.description && (
+        <p className="task-description">{task.description}</p>
+      )}
 
       <div className="task-badges">
         <span className={priorityClass(task.priority)}>{task.priority || 'Low'}</span>
