@@ -9,6 +9,11 @@ const CURRENT_USER = localStorage.getItem('username') || 'Fariha'
 
 const DEFAULT_ASSIGNEES = ['Fariha', 'Dev 2', 'Dev 3']
 
+const INITIAL_INVITES = [
+  { id: 1, email: 'dev2@flowboard.test', status: 'Pending' },
+  { id: 2, email: 'dev3@flowboard.test', status: 'Accepted' },
+]
+
 const INITIAL_TASKS = [
   {
     id: 1,
@@ -112,6 +117,93 @@ function applyFilter(tasks, tab, search) {
 }
 
 const EMPTY_FORM = { title: '', description: '', priority: 'Medium', deadline: '', assignee: '' }
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+function InviteMemberModal({ invites, onClose, onInvite }) {
+  const [email, setEmail] = useState('')
+  const [error, setError] = useState('')
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const nextEmail = email.trim().toLowerCase()
+
+    if (!nextEmail) {
+      setError('Email address is required.')
+      return
+    }
+
+    if (!isValidEmail(nextEmail)) {
+      setError('Enter a valid email address.')
+      return
+    }
+
+    if (invites.some(invite => invite.email.toLowerCase() === nextEmail)) {
+      setError('This member has already been invited.')
+      return
+    }
+
+    onInvite(nextEmail)
+    setEmail('')
+    setError('')
+  }
+
+  return (
+    <div className="task-modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="task-modal invite-modal" role="dialog" aria-modal="true" aria-labelledby="invite-title">
+        <h2 id="invite-title" className="task-modal-title">Invite Member</h2>
+
+        <form className="invite-form" onSubmit={handleSubmit} noValidate>
+          <div className="form-group">
+            <label htmlFor="invite-email">Email address</label>
+            <div className="invite-email-row">
+              <input
+                id="invite-email"
+                type="email"
+                value={email}
+                onChange={e => { setEmail(e.target.value); setError('') }}
+                placeholder="teammate@example.com"
+                autoFocus
+              />
+              <button type="submit" className="primary-btn invite-send-btn">
+                Send Invite
+              </button>
+            </div>
+          </div>
+
+          {error && <p className="hint task-modal-error">{error}</p>}
+
+          <div className="invite-list">
+            <div className="invite-list-header">
+              <span>Members</span>
+              <span>{invites.length}</span>
+            </div>
+
+            {invites.length === 0 ? (
+              <p className="invite-empty">No members invited yet.</p>
+            ) : (
+              invites.map(invite => (
+                <div key={invite.id} className="invite-row">
+                  <span className="invite-avatar">{invite.email[0].toUpperCase()}</span>
+                  <span className="invite-email">{invite.email}</span>
+                  <span className={`invite-status invite-status--${invite.status.toLowerCase()}`}>
+                    {invite.status}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="task-modal-actions">
+            <button type="button" className="ghost-btn" onClick={onClose}>Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
 
 function AddTaskModal({ defaultStatus, assigneeOptions, onClose, onAdd }) {
   const [form, setForm] = useState({
@@ -311,6 +403,8 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
   const [activeTab, setActiveTab] = useState('All Tasks')
   const [search, setSearch] = useState('')
   const [modal, setModal] = useState(null)
+  const [inviteOpen, setInviteOpen] = useState(false)
+  const [invites, setInvites] = useState(INITIAL_INVITES)
 
   const assigneeOptions = useMemo(() => getAssigneeOptions(tasks), [tasks])
   const visibleTasks = applyFilter(tasks, activeTab, search)
@@ -332,6 +426,13 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
     setTasks(prev => prev.filter(t => t.id !== id))
   }
 
+  const handleInvite = (email) => {
+    setInvites(prev => [
+      { id: Date.now(), email, status: 'Pending' },
+      ...prev,
+    ])
+  }
+
   const wsName = `Workspace #${workspaceId ?? 1}`
 
   return (
@@ -350,6 +451,12 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
             onClick={() => onNavigate && onNavigate('activity', workspaceId)}
           >
             Activity Log
+          </button>
+          <button
+            className="board-nav-pill board-nav-pill--invite"
+            onClick={() => setInviteOpen(true)}
+          >
+            Invite Member
           </button>
         </div>
       </nav>
@@ -440,6 +547,14 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
           assigneeOptions={assigneeOptions}
           onClose={() => setModal(null)}
           onAdd={handleAdd}
+        />
+      )}
+
+      {inviteOpen && (
+        <InviteMemberModal
+          invites={invites}
+          onClose={() => setInviteOpen(false)}
+          onInvite={handleInvite}
         />
       )}
     </div>

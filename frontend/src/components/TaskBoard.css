@@ -67,6 +67,13 @@
 }
 .board-nav-pill--workspace:hover { background: #DBEAFE; }
 
+.board-nav-pill--invite {
+  background: #FFFFFF;
+  border-color: #BFDBFE;
+  color: #1E40AF;
+}
+.board-nav-pill--invite:hover { background: #EEF5FF; }
+
 /* ── Page content ────────────────────────────────── */
 .board-content {
   flex: 1;
@@ -511,6 +518,106 @@
   color: #DC2626;
 }
 
+.invite-modal {
+  max-width: 560px;
+}
+
+.invite-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.invite-email-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: .75rem;
+}
+
+.invite-send-btn {
+  height: 42px;
+  white-space: nowrap;
+}
+
+.invite-list {
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  background: #F9FAFB;
+  overflow: hidden;
+}
+
+.invite-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .75rem .85rem;
+  border-bottom: 1px solid #D1D5DB;
+  color: #6B7280;
+  font-size: .78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.invite-row {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .65rem;
+  padding: .75rem .85rem;
+  border-bottom: 1px solid #E5E7EB;
+}
+.invite-row:last-child { border-bottom: none; }
+
+.invite-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #BFDBFE;
+  background: #EEF5FF;
+  color: #1E40AF;
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.invite-email {
+  min-width: 0;
+  color: #111827;
+  font-size: .875rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.invite-status {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: .7rem;
+  font-weight: 800;
+}
+.invite-status--pending {
+  border: 1px solid #FCD34D;
+  background: #FFFBEB;
+  color: #B45309;
+}
+.invite-status--accepted {
+  border: 1px solid #6EE7B7;
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.invite-empty {
+  margin: 0;
+  padding: 1rem;
+  color: #9CA3AF;
+  font-size: .85rem;
+  text-align: center;
+}
+
 /* ── Responsive ──────────────────────────────────── */
 @media (max-width: 900px) {
   .board-content { padding: 1rem 1.25rem 1.5rem; }
@@ -529,6 +636,8 @@
 @media (max-width: 600px) {
   .task-modal-row { grid-template-columns: 1fr; }
   .task-modal-actions { flex-direction: column; }
+  .invite-email-row { grid-template-columns: 1fr; }
+  .invite-send-btn { width: 100%; }
 }
 
 @media (max-width: 480px) {
