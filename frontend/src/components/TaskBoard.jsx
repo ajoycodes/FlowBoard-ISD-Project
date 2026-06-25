@@ -122,7 +122,7 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
-function InviteMemberModal({ invites, onClose, onInvite }) {
+function InviteMemberModal({ invites, onClose, onInvite, onRemove }) {
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
 
@@ -191,6 +191,14 @@ function InviteMemberModal({ invites, onClose, onInvite }) {
                   <span className={`invite-status invite-status--${invite.status.toLowerCase()}`}>
                     {invite.status}
                   </span>
+                  <button
+                    type="button"
+                    className="invite-remove-btn"
+                    onClick={() => onRemove(invite.id)}
+                    aria-label={`Remove ${invite.email}`}
+                  >
+                    Remove
+                  </button>
                 </div>
               ))
             )}
@@ -433,6 +441,14 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
     ])
   }
 
+  const handleRemoveInvite = (id) => {
+    const invite = invites.find(item => item.id === id)
+    if (!invite) return
+    if (!window.confirm(`Remove ${invite.email} from this workspace?`)) return
+
+    setInvites(prev => prev.filter(item => item.id !== id))
+  }
+
   const wsName = `Workspace #${workspaceId ?? 1}`
 
   return (
@@ -555,6 +571,7 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
           invites={invites}
           onClose={() => setInviteOpen(false)}
           onInvite={handleInvite}
+          onRemove={handleRemoveInvite}
         />
       )}
     </div>

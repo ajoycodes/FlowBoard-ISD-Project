@@ -561,7 +561,7 @@
 
 .invite-row {
   display: grid;
-  grid-template-columns: 30px minmax(0, 1fr) auto;
+  grid-template-columns: 30px minmax(0, 1fr) auto auto;
   align-items: center;
   gap: .65rem;
   padding: .75rem .85rem;
@@ -610,6 +610,24 @@
   color: #065F46;
 }
 
+.invite-remove-btn {
+  height: 30px;
+  padding: 0 .75rem;
+  border: 1px solid #FCA5A5;
+  border-radius: 7px;
+  background: #FEF2F2;
+  color: #DC2626;
+  font-size: .75rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .15s, transform .15s;
+}
+.invite-remove-btn:hover {
+  background: #FEE2E2;
+  transform: translateY(-1px);
+}
+
 .invite-empty {
   margin: 0;
   padding: 1rem;
@@ -638,6 +656,9 @@
   .task-modal-actions { flex-direction: column; }
   .invite-email-row { grid-template-columns: 1fr; }
   .invite-send-btn { width: 100%; }
+  .invite-row { grid-template-columns: 30px minmax(0, 1fr); }
+  .invite-status,
+  .invite-remove-btn { grid-column: 2; justify-self: start; }
 }
 
 @media (max-width: 480px) {
