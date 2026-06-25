@@ -226,7 +226,7 @@ function AddTaskModal({ defaultStatus, assigneeOptions, onClose, onAdd }) {
   )
 }
 
-function TaskCard({ task, assigneeOptions, onAssign, onMove, onDelete }) {
+function TaskCard({ task, workspaceId, assigneeOptions, onAssign, onMove, onDelete, onNavigate }) {
   const nextStatus = task.status === 'To Do' ? 'In Progress'
     : task.status === 'In Progress' ? 'Done'
     : null
@@ -249,6 +249,14 @@ function TaskCard({ task, assigneeOptions, onAssign, onMove, onDelete }) {
           {initials(task.assignee)}
         </span>
       </div>
+
+      <button
+        className="task-notes-btn"
+        onClick={() => onNavigate && onNavigate('notes', workspaceId, task.id)}
+        title="View notes for this task"
+      >
+        View Notes
+      </button>
 
       <label className="task-assignee-field">
         <span>Assignee</span>
@@ -403,10 +411,12 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
                       <TaskCard
                         key={task.id}
                         task={task}
+                        workspaceId={workspaceId}
                         assigneeOptions={assigneeOptions}
                         onAssign={handleAssign}
                         onMove={handleMove}
                         onDelete={handleDelete}
+                        onNavigate={onNavigate}
                       />
                     ))
                   )}

@@ -323,6 +323,26 @@
   justify-content: center;
 }
 
+.task-notes-btn {
+  width: 100%;
+  min-height: 34px;
+  margin: 0 0 .55rem;
+  border: 1px solid #BFDBFE;
+  border-radius: 8px;
+  background: #EEF5FF;
+  color: #1E40AF;
+  font-size: .78rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, transform .15s;
+}
+.task-notes-btn:hover {
+  background: #DBEAFE;
+  border-color: #93C5FD;
+  transform: translateY(-1px);
+}
+
 .task-assignee-field {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
