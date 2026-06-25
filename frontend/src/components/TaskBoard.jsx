@@ -326,7 +326,7 @@ function AddTaskModal({ defaultStatus, assigneeOptions, onClose, onAdd }) {
   )
 }
 
-function TaskCard({ task, workspaceId, assigneeOptions, onAssign, onMove, onDelete, onNavigate }) {
+function TaskCard({ task, workspaceId, assigneeOptions, onAssign, onUpdate, onMove, onDelete, onNavigate }) {
   const nextStatus = task.status === 'To Do' ? 'In Progress'
     : task.status === 'In Progress' ? 'Done'
     : null
@@ -370,9 +370,34 @@ function TaskCard({ task, workspaceId, assigneeOptions, onAssign, onMove, onDele
         </select>
       </label>
 
-      {task.deadline && (
-        <p className="task-deadline">Due {fmtDate(task.deadline)}</p>
-      )}
+      <div className="task-edit-row">
+        <label className="task-edit-field">
+          <span>Priority</span>
+          <select
+            value={task.priority || 'Low'}
+            onChange={e => onUpdate(task.id, { priority: e.target.value })}
+            className="task-card-select"
+            aria-label={`Priority for ${task.title}`}
+          >
+            <option>High</option>
+            <option>Medium</option>
+            <option>Low</option>
+          </select>
+        </label>
+
+        <label className="task-edit-field">
+          <span>Deadline</span>
+          <input
+            type="date"
+            value={task.deadline || ''}
+            onChange={e => onUpdate(task.id, { deadline: e.target.value })}
+            className="task-card-date"
+            aria-label={`Deadline for ${task.title}`}
+          />
+        </label>
+      </div>
+
+      <p className="task-deadline">{task.deadline ? `Due ${fmtDate(task.deadline)}` : 'No deadline set'}</p>
 
       <div className="task-actions">
         {prevStatus && (
@@ -424,6 +449,10 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
 
   const handleAssign = (id, assignee) => {
     setTasks(prev => prev.map(t => t.id === id ? { ...t, assignee } : t))
+  }
+
+  const handleUpdateTask = (id, updates) => {
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t))
   }
 
   const handleMove = (id, newStatus) => {
@@ -537,6 +566,7 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
                         workspaceId={workspaceId}
                         assigneeOptions={assigneeOptions}
                         onAssign={handleAssign}
+                        onUpdate={handleUpdateTask}
                         onMove={handleMove}
                         onDelete={handleDelete}
                         onNavigate={onNavigate}

@@ -383,6 +383,47 @@
   box-shadow: 0 0 0 3px rgba(96, 165, 250, .2);
 }
 
+.task-edit-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  margin: 0 0 .45rem;
+}
+
+.task-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #6B7280;
+  font-size: .72rem;
+  font-weight: 600;
+}
+
+.task-card-select,
+.task-card-date {
+  width: 100%;
+  height: 30px;
+  min-width: 0;
+  padding: 0 .5rem;
+  border: 1px solid #9CA3AF;
+  border-radius: 6px;
+  background: #FFFFFF;
+  color: #374151;
+  font-size: .75rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+.task-card-select:hover,
+.task-card-date:hover { background: #F9FAFB; }
+.task-card-select:focus,
+.task-card-date:focus {
+  outline: none;
+  border-color: #6B7280;
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, .15);
+}
+
 /* Deadline text */
 .task-deadline {
   margin: 0 0 .4rem;
@@ -659,6 +700,7 @@
   .invite-row { grid-template-columns: 30px minmax(0, 1fr); }
   .invite-status,
   .invite-remove-btn { grid-column: 2; justify-self: start; }
+  .task-edit-row { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
