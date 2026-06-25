@@ -21,6 +21,21 @@
   font-weight: 600;
 }
 
+.db-section-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 .45rem;
+  border-radius: 13px;
+  border: 1px solid #9CA3AF;
+  background: #E5E7EB;
+  color: #374151;
+  font-size: .78rem;
+  font-weight: 800;
+}
+
 .db-tasks-heading { margin-bottom: .85rem; }
 
 .db-new-btn {
@@ -127,6 +142,79 @@
 .db-empty--cards { margin-bottom: 2.25rem; }
 
 /* ── Recent Tasks table ───────────────────────────────────── */
+.db-deadline-section {
+  margin-bottom: 2.25rem;
+}
+
+.db-deadline-header {
+  margin-bottom: .85rem;
+}
+
+.db-deadline-list {
+  background: #FFFFFF;
+  border: 1px solid #9CA3AF;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.db-deadline-item {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: .9rem;
+  padding: .85rem 1rem;
+  border-bottom: 1px solid #E5E7EB;
+}
+.db-deadline-item:last-child { border-bottom: none; }
+.db-deadline-item:nth-child(even) { background: #F9FAFB; }
+
+.db-deadline-date {
+  width: 48px;
+  min-height: 48px;
+  border: 1px solid #BFDBFE;
+  border-radius: 8px;
+  background: #EEF5FF;
+  color: #1E40AF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.db-deadline-day {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.db-deadline-month {
+  margin-top: 3px;
+  font-size: .7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.db-deadline-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .18rem;
+}
+
+.db-deadline-title {
+  color: #111827;
+  font-size: .92rem;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.db-deadline-meta {
+  color: #6B7280;
+  font-size: .8rem;
+}
+
 .db-tasks-section { margin-top: .25rem; }
 
 .db-table-wrapper {
@@ -208,4 +296,6 @@
 @media (max-width: 600px) {
   .db-section-header { flex-direction: column; align-items: flex-start; }
   .db-cards-grid     { grid-template-columns: 1fr; }
+  .db-deadline-item  { grid-template-columns: 48px minmax(0, 1fr); }
+  .db-deadline-item .db-badge { grid-column: 2; justify-self: start; }
 }
