@@ -9,7 +9,6 @@ use App\Models\ActivityLog;
 class Workspace extends Model
 {
     use HasFactory;
-    protected $table = 'WORKSPACES';
 
     protected $fillable = [
         'name',
@@ -42,5 +41,15 @@ class Workspace extends Model
     public function activityLogs()
     {
         return $this->hasMany(ActivityLog::class);
+    }
+
+    public function notes()
+    {
+        return $this->hasMany(Note::class);
+    }
+
+    public function invitations()
+    {
+        return $this->hasMany(WorkspaceInvitation::class);
     }
 }

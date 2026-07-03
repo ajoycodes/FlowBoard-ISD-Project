@@ -82,12 +82,44 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
+        $myTasksSortedByDeadline = Task::query()
+            ->select([
+                'tasks.id',
+                'tasks.workspace_id',
+                'tasks.project_id',
+                'tasks.assigned_to',
+                'tasks.created_by',
+                'tasks.updated_by',
+                'tasks.title',
+                'tasks.description',
+                'tasks.status',
+                'tasks.priority',
+                'tasks.deadline',
+                'tasks.created_at',
+                'tasks.updated_at',
+            ])
+            ->with([
+                'workspace:id,name',
+                'project:id,name,workspace_id',
+            ])
+            ->whereHas('workspace.members', function ($query) use ($user) {
+                $query->where('users.id', $user->id);
+            })
+            ->when($workspaceId, function ($query) use ($workspaceId) {
+                $query->where('tasks.workspace_id', $workspaceId);
+            })
+            ->where('tasks.assigned_to', $user->id)
+            ->orderByRaw('CASE WHEN deadline IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('deadline', 'asc')
+            ->get();
+
         return response()->json([
             'success' => true,
             'message' => 'Dashboard data fetched successfully.',
             'data' => [
                 'active_projects' => DashboardProjectResource::collection($activeProjects),
                 'recent_tasks' => DashboardTaskResource::collection($recentTasks),
+                'my_tasks_sorted_by_deadline' => $myTasksSortedByDeadline,
             ],
         ]);
     }

@@ -52,46 +52,34 @@ class ActivityLogController extends Controller
 
         $perPage = $request->query('per_page', 10);
 
-
-
-        $logs = $workspace->activityLogs()
-
+        $query = $workspace->activityLogs()
             ->select([
-
                 'id',
-
                 'workspace_id',
-
                 'user_id',
-
                 'action',
-
                 'entity_type',
-
                 'entity_id',
-
                 'description',
-
                 'created_at',
-
             ])
-
             ->with('user:id,name,email')
+            ->orderByDesc('created_at');
 
-            ->orderByDesc('created_at')
+        if ($request->filled('from')) {
+            $query->whereDate('created_at', '>=', $request->from);
+        }
 
-            ->paginate($perPage);
+        if ($request->filled('to')) {
+            $query->whereDate('created_at', '<=', $request->to);
+        }
 
-
+        $logs = $query->paginate($perPage);
 
         return response()->json([
-
             'success' => true,
-
             'message' => 'Activity logs fetched successfully.',
-
             'data' => $logs,
-
         ]);
 
     }
