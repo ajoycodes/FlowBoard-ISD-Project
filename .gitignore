@@ -20,3 +20,19 @@ Thumbs.db
 # Env files
 .env
 .env.*
+
+# PHP dependencies
+backend/vendor/
+
+# Local databases
+*.sqlite
+
+# Laravel storage
+backend/storage/logs/*.log
+backend/storage/framework/cache/data/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*.php
+
+# Dev server logs
+*.err.log
+vite-dev.log
