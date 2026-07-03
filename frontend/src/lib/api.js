@@ -108,7 +108,7 @@ export async function createTask(workspaceId, payload) {
 
 export async function updateTask(taskId, payload) {
   return request(`/tasks/${taskId}`, {
-    method: 'PATCH',
+    method: 'PUT',
     body: JSON.stringify(payload),
   })
 }
@@ -122,5 +122,5 @@ export async function deleteTask(taskId) {
 export async function getActivityLogs(workspaceId, params = {}) {
   const query = new URLSearchParams(params).toString()
 
-  return request(`/workspaces/${workspaceId}/activity-logs${query ? `?${query}` : ''}`)
+  return request(`/workspaces/${workspaceId}/activity${query ? `?${query}` : ''}`)
 }
