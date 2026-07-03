@@ -15,10 +15,10 @@ class WorkspaceInvitationController extends Controller
     {
         $user = $request->user();
 
-        if (! $this->userIsWorkspaceOwner($user->id, $workspace)) {
+        if (! $this->userIsWorkspaceAdmin($user->id, $workspace)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only the workspace owner can view invitations.',
+                'message' => 'Only workspace owners or admins can view invitations.',
             ], 403);
         }
 
@@ -38,10 +38,10 @@ class WorkspaceInvitationController extends Controller
     {
         $user = $request->user();
 
-        if (! $this->userIsWorkspaceOwner($user->id, $workspace)) {
+        if (! $this->userIsWorkspaceAdmin($user->id, $workspace)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only the workspace owner can send invitations.',
+                'message' => 'Only workspace owners or admins can send invitations.',
             ], 403);
         }
 
@@ -103,10 +103,10 @@ class WorkspaceInvitationController extends Controller
             ], 404);
         }
 
-        if (! $this->userIsWorkspaceOwner($user->id, $workspace)) {
+        if (! $this->userIsWorkspaceAdmin($user->id, $workspace)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only the workspace owner can view invitation details.',
+                'message' => 'Only workspace owners or admins can view invitation details.',
             ], 403);
         }
 
@@ -130,10 +130,10 @@ class WorkspaceInvitationController extends Controller
             ], 404);
         }
 
-        if (! $this->userIsWorkspaceOwner($user->id, $workspace)) {
+        if (! $this->userIsWorkspaceAdmin($user->id, $workspace)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only the workspace owner can remove invitations.',
+                'message' => 'Only workspace owners or admins can remove invitations.',
             ], 403);
         }
 
@@ -220,8 +220,16 @@ class WorkspaceInvitationController extends Controller
         ]);
     }
 
-    private function userIsWorkspaceOwner(int $userId, Workspace $workspace): bool
+    private function userIsWorkspaceAdmin(int $userId, Workspace $workspace): bool
     {
-        return $workspace->owner_id == $userId;
+        if ($workspace->owner_id == $userId) {
+            return true;
+        }
+
+        $member = $workspace->members()
+            ->where('users.id', $userId)
+            ->first();
+
+        return $member && $member->pivot->role === 'admin';
     }
 }

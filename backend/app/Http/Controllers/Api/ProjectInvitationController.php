@@ -14,10 +14,10 @@ class ProjectInvitationController extends Controller
     {
         $user = $request->user();
 
-        if (! $this->userIsProjectWorkspaceOwner($user->id, $project)) {
+        if (! $this->userIsProjectWorkspaceAdmin($user->id, $project)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only the workspace owner can view project invitations.',
+                'message' => 'Only workspace owners or admins can view project invitations.',
             ], 403);
         }
 
@@ -37,10 +37,10 @@ class ProjectInvitationController extends Controller
     {
         $user = $request->user();
 
-        if (! $this->userIsProjectWorkspaceOwner($user->id, $project)) {
+        if (! $this->userIsProjectWorkspaceAdmin($user->id, $project)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only the workspace owner can send project invitations.',
+                'message' => 'Only workspace owners or admins can send project invitations.',
             ], 403);
         }
 
@@ -109,10 +109,10 @@ class ProjectInvitationController extends Controller
             ], 404);
         }
 
-        if (! $this->userIsProjectWorkspaceOwner($user->id, $project)) {
+        if (! $this->userIsProjectWorkspaceAdmin($user->id, $project)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only the workspace owner can view invitation details.',
+                'message' => 'Only workspace owners or admins can view invitation details.',
             ], 403);
         }
 
@@ -136,10 +136,10 @@ class ProjectInvitationController extends Controller
             ], 404);
         }
 
-        if (! $this->userIsProjectWorkspaceOwner($user->id, $project)) {
+        if (! $this->userIsProjectWorkspaceAdmin($user->id, $project)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only the workspace owner can remove invitations.',
+                'message' => 'Only workspace owners or admins can remove invitations.',
             ], 403);
         }
 
@@ -236,5 +236,24 @@ class ProjectInvitationController extends Controller
         }
 
         return (int) $project->workspace->owner_id === (int) $userId;
+    }
+
+    private function userIsProjectWorkspaceAdmin(int $userId, Project $project): bool
+    {
+        $project->loadMissing('workspace');
+
+        if (! $project->workspace) {
+            return false;
+        }
+
+        if ((int) $project->workspace->owner_id === (int) $userId) {
+            return true;
+        }
+
+        $member = $project->workspace->members()
+            ->where('users.id', $userId)
+            ->first();
+
+        return $member && $member->pivot->role === 'admin';
     }
 }

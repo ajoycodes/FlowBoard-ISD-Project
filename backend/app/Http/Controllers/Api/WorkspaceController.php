@@ -89,10 +89,10 @@ class WorkspaceController extends Controller
 
     public function update(Request $request, Workspace $workspace): JsonResponse
     {
-        if (! $this->userIsWorkspaceOwner($request->user()->id, $workspace)) {
+        if (! $this->userIsWorkspaceAdmin($request->user()->id, $workspace)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only the workspace owner can update this workspace.',
+                'message' => 'Only workspace owners or admins can update this workspace.',
             ], 403);
         }
 
@@ -117,10 +117,10 @@ class WorkspaceController extends Controller
 
     public function destroy(Request $request, Workspace $workspace): JsonResponse
     {
-        if (! $this->userIsWorkspaceOwner($request->user()->id, $workspace)) {
+        if (! $this->userIsWorkspaceAdmin($request->user()->id, $workspace)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only the workspace owner can delete this workspace.',
+                'message' => 'Only workspace owners or admins can delete this workspace.',
             ], 403);
         }
 
@@ -134,10 +134,10 @@ class WorkspaceController extends Controller
 
     public function addMember(Request $request, Workspace $workspace): JsonResponse
     {
-        if (! $this->userIsWorkspaceOwner($request->user()->id, $workspace)) {
+        if (! $this->userIsWorkspaceAdmin($request->user()->id, $workspace)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only the workspace owner can send invitations.',
+                'message' => 'Only workspace owners or admins can send invitations.',
             ], 403);
         }
 
@@ -190,10 +190,10 @@ class WorkspaceController extends Controller
 
     public function removeMember(Request $request, Workspace $workspace, User $user): JsonResponse
     {
-        if (! $this->userIsWorkspaceOwner($request->user()->id, $workspace)) {
+        if (! $this->userIsWorkspaceAdmin($request->user()->id, $workspace)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only the workspace owner can remove members.',
+                'message' => 'Only workspace owners or admins can remove members.',
             ], 403);
         }
 
@@ -232,5 +232,18 @@ class WorkspaceController extends Controller
     private function userIsWorkspaceOwner(int $userId, Workspace $workspace): bool
     {
         return $workspace->owner_id == $userId;
+    }
+
+    private function userIsWorkspaceAdmin(int $userId, Workspace $workspace): bool
+    {
+        if ($workspace->owner_id == $userId) {
+            return true;
+        }
+
+        $member = $workspace->members()
+            ->where('users.id', $userId)
+            ->first();
+
+        return $member && $member->pivot->role === 'admin';
     }
 }
