@@ -67,7 +67,7 @@ class TaskController extends Controller
                 Task::STATUS_REVIEW,
                 Task::STATUS_DONE,
             ])],
-            'priority' => ['nullable', 'string'],
+            'priority' => ['nullable', 'string', 'in:low,medium,high'],
             'deadline' => ['nullable', 'date'],
         ]);
 
@@ -125,7 +125,7 @@ class TaskController extends Controller
                 Task::STATUS_REVIEW,
                 Task::STATUS_DONE,
             ])],
-            'priority' => ['nullable', 'string'],
+            'priority' => ['nullable', 'string', 'in:low,medium,high'],
             'deadline' => ['nullable', 'date'],
         ]);
 
