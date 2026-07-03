@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\WorkspaceController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\ActivityLogController;
 use App\Http\Controllers\Api\NoteController;
+use App\Http\Controllers\Api\WorkspaceInvitationController;
+use App\Http\Controllers\Api\ProjectInvitationController;
 
 Route::post('/register', [AuthController::class, 'register']);
 
@@ -27,6 +29,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/workspaces/{workspace}', [WorkspaceController::class, 'destroy']);
     Route::post('/workspaces/{workspace}/members', [WorkspaceController::class, 'addMember']);
     Route::delete('/workspaces/{workspace}/members/{user}', [WorkspaceController::class, 'removeMember']);
+    Route::get('/workspaces/{workspace}/invitations', [WorkspaceInvitationController::class, 'index']);
+    Route::post('/workspaces/{workspace}/invitations', [WorkspaceInvitationController::class, 'store']);
+    Route::get('/workspaces/{workspace}/invitations/{invitation}', [WorkspaceInvitationController::class, 'show']);
+    Route::delete('/workspaces/{workspace}/invitations/{invitation}', [WorkspaceInvitationController::class, 'destroy']);
+
+    Route::get('/invitations/my', [WorkspaceInvitationController::class, 'myInvitations']);
+    Route::post('/invitations/{invitation}/accept', [WorkspaceInvitationController::class, 'accept']);
+    Route::post('/invitations/{invitation}/decline', [WorkspaceInvitationController::class, 'decline']);
 
     Route::post('/workspaces/{workspace}/tasks', [TaskController::class, 'store']);
     Route::get('/workspaces/{workspace}/tasks', [TaskController::class, 'index']);
@@ -39,6 +49,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/projects/{project}', [ProjectController::class, 'show']);
     Route::put('/projects/{project}', [ProjectController::class, 'update']);
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
+
+    Route::get('/projects/{project}/invitations', [ProjectInvitationController::class, 'index']);
+    Route::post('/projects/{project}/invitations', [ProjectInvitationController::class, 'store']);
+    Route::get('/projects/{project}/invitations/{invitation}', [ProjectInvitationController::class, 'show']);
+    Route::delete('/projects/{project}/invitations/{invitation}', [ProjectInvitationController::class, 'destroy']);
+
+    Route::get('/project-invitations/my', [ProjectInvitationController::class, 'myInvitations']);
+    Route::post('/project-invitations/{invitation}/accept', [ProjectInvitationController::class, 'accept']);
+    Route::post('/project-invitations/{invitation}/decline', [ProjectInvitationController::class, 'decline']);
 
     Route::get('/workspaces/{workspace}/activity', [ActivityLogController::class, 'index']);
 

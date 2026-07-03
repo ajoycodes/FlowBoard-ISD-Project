@@ -1967,3 +1967,151 @@ Bindings      : []
 #44 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('D://FlowBoard-IS...')
 #45 {main}
 "} 
+[2026-07-03 12:25:57] local.ERROR: Command "route:" is ambiguous.
+Did you mean one of these?
+    route:cache Create a ...
+    route:clear Remove th...
+    route:list  List all .... {"exception":"[object] (Symfony\\Component\\Console\\Exception\\CommandNotFoundException(code: 0): Command \"route:\" is ambiguous.
+Did you mean one of these?
+    route:cache Create a ...
+    route:clear Remove th...
+    route:list  List all .... at D:/FlowBoard-ISD-Project/backend/vendor/symfony/console/Application.php:815)
+[stacktrace]
+#0 D:/FlowBoard-ISD-Project/backend/vendor/symfony/console/Application.php(298): Symfony/Component/Console/Application->find('route:')
+#1 D:/FlowBoard-ISD-Project/backend/vendor/symfony/console/Application.php(195): Symfony/Component/Console/Application->doRun(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#2 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#3 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate/Foundation/Console/Kernel->handle(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#4 D:/FlowBoard-ISD-Project/backend/artisan(16): Illuminate/Foundation/Application->handleCommand(Object(Symfony/Component/Console/Input/ArgvInput))
+#5 {main}
+"} 
+[2026-07-03 12:30:16] local.ERROR: Error Code    : 942
+Error Message : ORA-00942: table or view does not exist
+Position      : 26
+Statement     : select 1 as "exists" from "PROJECT_INVITATIONS" where "PROJECT_INVITATIONS"."PROJECT_ID" = :p0 and "PROJECT_INVITATIONS"."PROJECT_ID" is not null and "EMAIL" = :p1 and "STATUS" = :p2 and rownum = 1
+Bindings      : [21,john@example.com,pending]
+ (Connection: oracle, Host: 127.0.0.1, Port: 1521, Database: xe, SQL: select 1 as "exists" from "PROJECT_INVITATIONS" where "PROJECT_INVITATIONS"."PROJECT_ID" = 21 and "PROJECT_INVITATIONS"."PROJECT_ID" is not null and "EMAIL" = john@example.com and "STATUS" = pending and rownum = 1) {"userId":41,"exception":"[object] (Illuminate\\Database\\QueryException(code: 942): Error Code    : 942
+
+Error Message : ORA-00942: table or view does not exist
+
+Position      : 26
+
+Statement     : select 1 as \"exists\" from \"PROJECT_INVITATIONS\" where \"PROJECT_INVITATIONS\".\"PROJECT_ID\" = :p0 and \"PROJECT_INVITATIONS\".\"PROJECT_ID\" is not null and \"EMAIL\" = :p1 and \"STATUS\" = :p2 and rownum = 1
+
+Bindings      : [21,john@example.com,pending]
+
+ (Connection: oracle, Host: 127.0.0.1, Port: 1521, Database: xe, SQL: select 1 as \"exists\" from \"PROJECT_INVITATIONS\" where \"PROJECT_INVITATIONS\".\"PROJECT_ID\" = 21 and \"PROJECT_INVITATIONS\".\"PROJECT_ID\" is not null and \"EMAIL\" = john@example.com and \"STATUS\" = pending and rownum = 1) at D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838)
+[stacktrace]
+#0 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate/Database/Connection->runQueryCallback('select 1 as \"ex...', Array, Object(Closure))
+#1 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php(411): Illuminate/Database/Connection->run('select 1 as \"ex...', Array, Object(Closure))
+#2 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3878): Illuminate/Database/Connection->select('select 1 as \"ex...', Array, true)
+#3 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2237): Illuminate/Database/Query/Builder->exists()
+#4 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate/Database/Eloquent/Builder->__call('exists', Array)
+#5 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(52): Illuminate/Database/Eloquent/Relations/Relation->forwardCallTo(Object(Illuminate/Database/Eloquent/Builder), 'exists', Array)
+#6 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Relations/Relation.php(538): Illuminate/Database/Eloquent/Relations/Relation->forwardDecoratedCallTo(Object(Illuminate/Database/Eloquent/Builder), 'exists', Array)
+#7 D:/FlowBoard-ISD-Project/backend/app/Http/Controllers/Api/ProjectInvitationController.php(76): Illuminate/Database/Eloquent/Relations/Relation->__call('exists', Array)
+#8 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): App/Http/Controllers/Api/ProjectInvitationController->store(Object(Illuminate/Http/Request), Object(App/Models/Project))
+#9 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate/Routing/ControllerDispatcher->dispatch(Object(Illuminate/Routing/Route), Object(App/Http/Controllers/Api/ProjectInvitationController), 'store')
+#10 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate/Routing/Route->runController()
+#11 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate/Routing/Route->run()
+#12 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate/Routing/Router->Illuminate/Routing/{closure}(Object(Illuminate/Http/Request))
+#13 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#14 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Routing/Middleware/SubstituteBindings->handle(Object(Illuminate/Http/Request), Object(Closure))
+#15 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#16 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Auth/Middleware/Authenticate->handle(Object(Illuminate/Http/Request), Object(Closure), 'sanctum')
+#17 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#18 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate/Pipeline/Pipeline->then(Object(Closure))
+#19 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate/Routing/Router->runRouteWithinStack(Object(Illuminate/Routing/Route), Object(Illuminate/Http/Request))
+#20 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate/Routing/Router->runRoute(Object(Illuminate/Http/Request), Object(Illuminate/Routing/Route))
+#21 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate/Routing/Router->dispatchToRoute(Object(Illuminate/Http/Request))
+#22 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate/Routing/Router->dispatch(Object(Illuminate/Http/Request))
+#23 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate/Foundation/Http/Kernel->Illuminate/Foundation/Http/{closure}(Object(Illuminate/Http/Request))
+#24 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#25 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate/Foundation/Http/Middleware/TransformsRequest->handle(Object(Illuminate/Http/Request), Object(Closure))
+#26 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull->handle(Object(Illuminate/Http/Request), Object(Closure))
+#27 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#28 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate/Foundation/Http/Middleware/TransformsRequest->handle(Object(Illuminate/Http/Request), Object(Closure))
+#29 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/TrimStrings->handle(Object(Illuminate/Http/Request), Object(Closure))
+#30 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#31 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Http/Middleware/ValidatePostSize->handle(Object(Illuminate/Http/Request), Object(Closure))
+#32 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#33 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance->handle(Object(Illuminate/Http/Request), Object(Closure))
+#34 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#35 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Http/Middleware/HandleCors->handle(Object(Illuminate/Http/Request), Object(Closure))
+#36 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#37 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Http/Middleware/TrustProxies->handle(Object(Illuminate/Http/Request), Object(Closure))
+#38 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#39 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks->handle(Object(Illuminate/Http/Request), Object(Closure))
+#40 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#41 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Http/Middleware/ValidatePathEncoding->handle(Object(Illuminate/Http/Request), Object(Closure))
+#42 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#43 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate/Pipeline/Pipeline->then(Object(Closure))
+#44 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate/Foundation/Http/Kernel->sendRequestThroughRouter(Object(Illuminate/Http/Request))
+#45 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1220): Illuminate/Foundation/Http/Kernel->handle(Object(Illuminate/Http/Request))
+#46 D:/FlowBoard-ISD-Project/backend/public/index.php(20): Illuminate/Foundation/Application->handleRequest(Object(Illuminate/Http/Request))
+#47 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('D://FlowBoard-IS...')
+#48 {main}
+
+[previous exception] [object] (Yajra\\Pdo\\Oci8\\Exceptions\\Oci8Exception(code: 942): Error Code    : 942
+
+Error Message : ORA-00942: table or view does not exist
+
+Position      : 26
+
+Statement     : select 1 as \"exists\" from \"PROJECT_INVITATIONS\" where \"PROJECT_INVITATIONS\".\"PROJECT_ID\" = :p0 and \"PROJECT_INVITATIONS\".\"PROJECT_ID\" is not null and \"EMAIL\" = :p1 and \"STATUS\" = :p2 and rownum = 1
+
+Bindings      : [21,john@example.com,pending]
+
+ at D:/FlowBoard-ISD-Project/backend/vendor/yajra/laravel-pdo-via-oci8/src/Pdo/Oci8/Statement.php:798)
+[stacktrace]
+#0 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php(425): Yajra/Pdo/Oci8/Statement->execute()
+#1 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php(827): Illuminate/Database/Connection->Illuminate/Database/{closure}('select 1 as \"ex...', Array)
+#2 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate/Database/Connection->runQueryCallback('select 1 as \"ex...', Array, Object(Closure))
+#3 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php(411): Illuminate/Database/Connection->run('select 1 as \"ex...', Array, Object(Closure))
+#4 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3878): Illuminate/Database/Connection->select('select 1 as \"ex...', Array, true)
+#5 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2237): Illuminate/Database/Query/Builder->exists()
+#6 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate/Database/Eloquent/Builder->__call('exists', Array)
+#7 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(52): Illuminate/Database/Eloquent/Relations/Relation->forwardCallTo(Object(Illuminate/Database/Eloquent/Builder), 'exists', Array)
+#8 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Relations/Relation.php(538): Illuminate/Database/Eloquent/Relations/Relation->forwardDecoratedCallTo(Object(Illuminate/Database/Eloquent/Builder), 'exists', Array)
+#9 D:/FlowBoard-ISD-Project/backend/app/Http/Controllers/Api/ProjectInvitationController.php(76): Illuminate/Database/Eloquent/Relations/Relation->__call('exists', Array)
+#10 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): App/Http/Controllers/Api/ProjectInvitationController->store(Object(Illuminate/Http/Request), Object(App/Models/Project))
+#11 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate/Routing/ControllerDispatcher->dispatch(Object(Illuminate/Routing/Route), Object(App/Http/Controllers/Api/ProjectInvitationController), 'store')
+#12 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate/Routing/Route->runController()
+#13 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate/Routing/Route->run()
+#14 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate/Routing/Router->Illuminate/Routing/{closure}(Object(Illuminate/Http/Request))
+#15 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#16 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Routing/Middleware/SubstituteBindings->handle(Object(Illuminate/Http/Request), Object(Closure))
+#17 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#18 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Auth/Middleware/Authenticate->handle(Object(Illuminate/Http/Request), Object(Closure), 'sanctum')
+#19 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#20 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate/Pipeline/Pipeline->then(Object(Closure))
+#21 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate/Routing/Router->runRouteWithinStack(Object(Illuminate/Routing/Route), Object(Illuminate/Http/Request))
+#22 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate/Routing/Router->runRoute(Object(Illuminate/Http/Request), Object(Illuminate/Routing/Route))
+#23 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate/Routing/Router->dispatchToRoute(Object(Illuminate/Http/Request))
+#24 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate/Routing/Router->dispatch(Object(Illuminate/Http/Request))
+#25 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate/Foundation/Http/Kernel->Illuminate/Foundation/Http/{closure}(Object(Illuminate/Http/Request))
+#26 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#27 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate/Foundation/Http/Middleware/TransformsRequest->handle(Object(Illuminate/Http/Request), Object(Closure))
+#28 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull->handle(Object(Illuminate/Http/Request), Object(Closure))
+#29 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#30 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate/Foundation/Http/Middleware/TransformsRequest->handle(Object(Illuminate/Http/Request), Object(Closure))
+#31 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/TrimStrings->handle(Object(Illuminate/Http/Request), Object(Closure))
+#32 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#33 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Http/Middleware/ValidatePostSize->handle(Object(Illuminate/Http/Request), Object(Closure))
+#34 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#35 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance->handle(Object(Illuminate/Http/Request), Object(Closure))
+#36 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#37 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Http/Middleware/HandleCors->handle(Object(Illuminate/Http/Request), Object(Closure))
+#38 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#39 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Http/Middleware/TrustProxies->handle(Object(Illuminate/Http/Request), Object(Closure))
+#40 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#41 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks->handle(Object(Illuminate/Http/Request), Object(Closure))
+#42 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#43 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Http/Middleware/ValidatePathEncoding->handle(Object(Illuminate/Http/Request), Object(Closure))
+#44 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#45 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate/Pipeline/Pipeline->then(Object(Closure))
+#46 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate/Foundation/Http/Kernel->sendRequestThroughRouter(Object(Illuminate/Http/Request))
+#47 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1220): Illuminate/Foundation/Http/Kernel->handle(Object(Illuminate/Http/Request))
+#48 D:/FlowBoard-ISD-Project/backend/public/index.php(20): Illuminate/Foundation/Application->handleRequest(Object(Illuminate/Http/Request))
+#49 D:/FlowBoard-ISD-Project/backend/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('D://FlowBoard-IS...')
+#50 {main}
+"} 
