@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { getWorkspaces, deleteWorkspace } from '../lib/api'
 import DashboardLayout from './DashboardLayout'
 import Workspace from './Workspace'
 import './Dashboard.css'
@@ -12,11 +13,11 @@ const INITIAL_WORKSPACES = [
 ]
 
 const MOCK_TASKS = [
-  { id: 1, title: 'Implement login page',       status: 'Done',        priority: 'High',   deadline: '2026-06-01', assignee: 'Fariha' },
-  { id: 2, title: 'Design dashboard UI',        status: 'In Progress', priority: 'High',   deadline: '2026-06-05', assignee: 'Fariha' },
-  { id: 3, title: 'Set up Oracle schema',       status: 'Done',        priority: 'Medium', deadline: '2026-05-28', assignee: 'Dev 2'  },
-  { id: 4, title: 'Activity log API endpoint',  status: 'To Do',       priority: 'Medium', deadline: '2026-06-10', assignee: 'Dev 3'  },
-  { id: 5, title: 'Write unit tests',           status: 'To Do',       priority: 'Low',    deadline: '2026-06-15', assignee: 'Dev 2'  },
+  { id: 5, title: 'Implement login page',       status: 'Done',        priority: 'High',   deadline: '2026-06-01', assignee: 'Fariha' },
+  { id: 3, title: 'Design dashboard UI',        status: 'In Progress', priority: 'High',   deadline: '2026-06-05', assignee: 'Fariha' },
+  { id: 4, title: 'Set up Oracle schema',       status: 'Done',        priority: 'Medium', deadline: '2026-05-28', assignee: 'Dev 2'  },
+  { id: 1, title: 'Activity log API endpoint',  status: 'To Do',       priority: 'Medium', deadline: '2026-06-10', assignee: 'Dev 3'  },
+  { id: 2, title: 'Write unit tests',           status: 'To Do',       priority: 'Low',    deadline: '2026-06-15', assignee: 'Dev 2'  },
 ]
 
 function statusClass(status) {
@@ -39,13 +40,22 @@ function formatDeadline(deadline) {
 }
 
 export default function Dashboard({ onNavigate }) {
-  const [workspaces, setWorkspaces] = useState(INITIAL_WORKSPACES)
+  const [workspaces, setWorkspaces] = useState([])
+const [recentTasks, setRecentTasks] = useState([])
+const [loading, setLoading] = useState(false)
+const [error, setError] = useState('')
   const [showModal,  setShowModal]  = useState(false)
 
-  const handleDelete = (id) => {
-    if (!window.confirm('Delete this workspace?')) return
+  const handleDelete = async (id) => {
+  if (!window.confirm('Delete this workspace?')) return
+
+  try {
+    await deleteWorkspace(id)
     setWorkspaces(prev => prev.filter(w => w.id !== id))
+  } catch (error) {
+    setError(error.message || 'Failed to delete workspace.')
   }
+}
 
   const handleCreated = (newWs) => {
     setWorkspaces(prev => [...prev, newWs])
@@ -57,6 +67,25 @@ export default function Dashboard({ onNavigate }) {
   const deadlineSortedTasks = [...MOCK_TASKS]
     .filter(task => task.deadline)
     .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
+
+  useEffect(() => {
+  async function loadDashboard() {
+    try {
+      setLoading(true)
+      setError('')
+
+    const result = await getWorkspaces()
+    setWorkspaces(result.data || result)
+  } catch (error) {
+    setWorkspaces(INITIAL_WORKSPACES)
+    setError(error.message || 'Failed to load dashboard.')
+  } finally {
+      setLoading(false)
+    }
+  }
+
+  loadDashboard()
+}, [])
 
   return (
     <DashboardLayout activeNav="dashboard" onNavigate={onNavigate} workspaceId={firstWsId}>
@@ -153,6 +182,7 @@ export default function Dashboard({ onNavigate }) {
                 <th>Priority</th>
                 <th>Deadline</th>
                 <th>Assignee</th>
+                <th>Notes</th>
               </tr>
             </thead>
             <tbody>
@@ -169,6 +199,14 @@ export default function Dashboard({ onNavigate }) {
                     {formatDeadline(task.deadline)}
                   </td>
                   <td className="db-task-meta">{task.assignee}</td>
+                  <td>
+                    <button
+                      className="ghost-btn db-card-btn"
+                      onClick={() => onNavigate('notes', firstWsId, task.id)}
+                    >
+                      Notes
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

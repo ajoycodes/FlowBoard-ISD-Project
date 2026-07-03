@@ -6,15 +6,16 @@ export default function DashboardLayout({ children, activeNav, onNavigate, works
   const wsId    = workspaceId ?? 1
   const username = localStorage.getItem('username') || 'User'
   const initials = username.slice(0, 1).toUpperCase()
+  const role = localStorage.getItem('role') || 'Member'
 
   // Simple user-menu dropdown toggle
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const handleLogout = () => {
-    logout()               // clears token + username from localStorage
-    setMenuOpen(false)
-    onNavigate('login')    // redirect to login page
-  }
+  const handleLogout = async () => {
+  await logout()
+  setMenuOpen(false)
+  onNavigate('login')
+}
 
   return (
     <div className="dl-root">
@@ -45,7 +46,7 @@ export default function DashboardLayout({ children, activeNav, onNavigate, works
                 <div className="dl-user-menu" role="menu">
                   <div className="dl-menu-info">
                     <span className="dl-menu-name">{username}</span>
-                    <span className="dl-menu-role">Member</span>
+                    <span className="dl-menu-role">{role}</span>
                   </div>
                   <div className="dl-menu-divider" />
                   <button
@@ -87,6 +88,14 @@ export default function DashboardLayout({ children, activeNav, onNavigate, works
             >
               <span className="dl-navicon" aria-hidden="true">&#9776;</span>
               Activity
+            </button>
+
+            <button
+              className={`dl-navlink${activeNav === 'notes' ? ' dl-navlink--active' : ''}`}
+              onClick={() => onNavigate('notes', wsId)}
+            >
+              <span className="dl-navicon" aria-hidden="true">&#9998;</span>
+              Notes
             </button>
 
           </nav>

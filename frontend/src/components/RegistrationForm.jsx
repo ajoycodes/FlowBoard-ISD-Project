@@ -3,29 +3,38 @@ import { register } from '../lib/api'
 
 export default function RegistrationForm({ onRegistered, onNavigate }) {
   const [form, setForm] = React.useState({
-    name: 'Fariha',
-    email: 'fariha@flowboard.local',
-    role: 'Frontend Developer',
-    password: 'flowboard123',
-    confirm: 'flowboard123'
-  })
+  name: '',
+  email: '',
+  role: '',
+  password: '',
+  confirm: ''
+})
   const [status, setStatus] = React.useState('')
   const [loading, setLoading] = React.useState(false)
 
   const update = (key, value) => setForm(f => ({ ...f, [key]: value }))
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (form.password !== form.confirm) {
-      setStatus('Passwords do not match.')
-      return
-    }
-    setLoading(true)
-    setStatus('Creating your account...')
-    await register(form)
-    setLoading(false)
-    if (onRegistered) onRegistered()
+  e.preventDefault()
+
+  if (form.password !== form.confirm) {
+    setStatus('Passwords do not match.')
+    return
   }
+
+  setLoading(true)
+  setStatus('Creating your account...')
+
+  try {
+    await register(form)
+    setStatus('')
+    if (onRegistered) onRegistered()
+  } catch (error) {
+    setStatus(error.message || 'Registration failed.')
+  } finally {
+    setLoading(false)
+  }
+}
 
   return (
     <div className="auth-layout">
