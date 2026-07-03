@@ -42,4 +42,9 @@ class Workspace extends Model
     {
         return $this->hasMany(ActivityLog::class);
     }
+
+    public function notes()
+    {
+        return $this->hasMany(Note::class);
+    }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\WorkspaceController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\ActivityLogController;
+use App\Http\Controllers\Api\NoteController;
 
 Route::post('/register', [AuthController::class, 'register']);
 
@@ -40,4 +41,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
 
     Route::get('/workspaces/{workspace}/activity', [ActivityLogController::class, 'index']);
+
+    Route::get('/workspaces/{workspace}/notes', [NoteController::class, 'index']);
+    Route::post('/workspaces/{workspace}/notes', [NoteController::class, 'store']);
+    Route::get('/workspaces/{workspace}/notes/{note}', [NoteController::class, 'show']);
+    Route::put('/workspaces/{workspace}/notes/{note}', [NoteController::class, 'update']);
+    Route::delete('/workspaces/{workspace}/notes/{note}', [NoteController::class, 'destroy']);
 });
