@@ -101,6 +101,10 @@ php artisan migrate
 php artisan serve
 ```
 
+> **Local development without Oracle:** set `DB_CONNECTION=sqlite` in
+> `.env` (and remove the other `DB_*` lines), create an empty
+> `database/database.sqlite` file, then run `php artisan migrate`.
+
 ### Frontend Setup
 
 ```bash
