@@ -33,6 +33,11 @@ function priorityClass(priority) {
   return 'db-badge db-badge--low'
 }
 
+function formatDeadline(deadline) {
+  const d = new Date(deadline)
+  return isNaN(d.getTime()) ? deadline : d.toLocaleDateString()
+}
+
 export default function Dashboard({ onNavigate }) {
   const [workspaces, setWorkspaces] = useState(INITIAL_WORKSPACES)
   const [showModal,  setShowModal]  = useState(false)
@@ -49,6 +54,9 @@ export default function Dashboard({ onNavigate }) {
 
   // pass first workspace id so the sidebar Activity link is always enabled
   const firstWsId = workspaces[0]?.id ?? 1
+  const deadlineSortedTasks = [...MOCK_TASKS]
+    .filter(task => task.deadline)
+    .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
 
   return (
     <DashboardLayout activeNav="dashboard" onNavigate={onNavigate} workspaceId={firstWsId}>
@@ -102,6 +110,38 @@ export default function Dashboard({ onNavigate }) {
       )}
 
       {/* ── Recent Tasks table ───────────────────────────────── */}
+      <div className="db-deadline-section">
+        <div className="db-section-header db-deadline-header">
+          <h2 className="db-section-title">Tasks by Deadline</h2>
+          <span className="db-section-count">{deadlineSortedTasks.length}</span>
+        </div>
+
+        <div className="db-deadline-list">
+          {deadlineSortedTasks.map(task => (
+            <div key={task.id} className="db-deadline-item">
+              <div className="db-deadline-date">
+                <span className="db-deadline-day">
+                  {new Date(task.deadline).toLocaleDateString(undefined, { day: '2-digit' })}
+                </span>
+                <span className="db-deadline-month">
+                  {new Date(task.deadline).toLocaleDateString(undefined, { month: 'short' })}
+                </span>
+              </div>
+
+              <div className="db-deadline-main">
+                <span className="db-deadline-title">{task.title}</span>
+                <span className="db-deadline-meta">
+                  Due {formatDeadline(task.deadline)} · {task.assignee}
+                </span>
+              </div>
+
+              <span className={priorityClass(task.priority)}>{task.priority}</span>
+              <span className={statusClass(task.status)}>{task.status}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="db-tasks-section">
         <h2 className="db-section-title db-tasks-heading">Recent Tasks</h2>
         <div className="db-table-wrapper">
@@ -126,7 +166,7 @@ export default function Dashboard({ onNavigate }) {
                     <span className={priorityClass(task.priority)}>{task.priority}</span>
                   </td>
                   <td className="db-task-meta">
-                    {new Date(task.deadline).toLocaleDateString()}
+                    {formatDeadline(task.deadline)}
                   </td>
                   <td className="db-task-meta">{task.assignee}</td>
                 </tr>

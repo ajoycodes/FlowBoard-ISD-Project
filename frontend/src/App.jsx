@@ -5,6 +5,7 @@ import ForgotPassword  from './components/ForgotPassword'
 import Dashboard       from './components/Dashboard'
 import TaskBoard       from './components/TaskBoard'
 import ActivityLog     from './components/ActivityLog'
+import NotesEditor     from './components/NotesEditor'
 
 // ── Auth shell wrapper ────────────────────────────────────────────
 function AuthShell({ children }) {
@@ -25,16 +26,17 @@ function AuthShell({ children }) {
 
 // ── App ───────────────────────────────────────────────────────────
 export default function App() {
-  const [route, setRoute] = useState({ page: 'login', workspaceId: null })
+  const [route, setRoute] = useState({ page: 'login', workspaceId: null, taskId: null })
 
   // navigate('login') | navigate('dashboard') | navigate('workspace', id) …
-  const navigate = (page, workspaceId = null) => setRoute({ page, workspaceId })
+  const navigate = (page, workspaceId = null, taskId = null) => setRoute({ page, workspaceId, taskId })
 
-  const { page, workspaceId } = route
+  const { page, workspaceId, taskId } = route
 
   // ── Dashboard pages ──
   if (page === 'dashboard') return <Dashboard  onNavigate={navigate} />
   if (page === 'workspace') return <TaskBoard  workspaceId={workspaceId} onNavigate={navigate} />
+  if (page === 'notes')     return <NotesEditor workspaceId={workspaceId} taskId={taskId} onNavigate={navigate} />
   if (page === 'activity')  return <ActivityLog workspaceId={workspaceId} onNavigate={navigate} />
 
   // ── Auth pages ──
