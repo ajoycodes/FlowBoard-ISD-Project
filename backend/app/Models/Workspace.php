@@ -9,7 +9,6 @@ use App\Models\ActivityLog;
 class Workspace extends Model
 {
     use HasFactory;
-    protected $table = 'WORKSPACES';
 
     protected $fillable = [
         'name',

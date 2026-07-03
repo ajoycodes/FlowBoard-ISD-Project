@@ -77,6 +77,7 @@ class WorkspaceController extends Controller
             'owner:id,name,email',
             'members:id,name,email',
             'projects:id,workspace_id,name,status,created_at,updated_at',
+            'tasks:id,workspace_id,title,status,priority,assigned_to,created_at,updated_at',
         ]);
 
         return response()->json([
