@@ -230,4 +230,23 @@ class TaskController extends Controller
             'data' => $task->fresh(),
         ]);
     }
+
+    public function destroy(Request $request, Task $task): JsonResponse
+    {
+        $user = $request->user();
+
+        if (! $task->workspace->members()->where('users.id', $user->id)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to delete this task.',
+            ], 403);
+        }
+
+        $task->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Task deleted successfully.',
+        ]);
+    }
 }

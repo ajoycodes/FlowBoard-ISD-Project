@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/workspaces/{workspace}/tasks', [TaskController::class, 'store']);
     Route::get('/workspaces/{workspace}/tasks', [TaskController::class, 'index']);
     Route::put('/tasks/{task}', [TaskController::class, 'update']);
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
     Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus']);
     Route::patch('/tasks/{task}/assign', [TaskController::class, 'assign']);
 
