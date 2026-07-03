@@ -13,7 +13,7 @@
 .ws-modal {
   background: #FFFFFF;
   border-radius: 12px;
-  border: 1px solid #D1D5DB;
+  border: 1px solid var(--border);
   padding: 1.75rem;
   width: 100%;
   max-width: 400px;
@@ -30,7 +30,7 @@
 
 .ws-modal-title {
   margin: 0;
-  color: #111827;
+  color: var(--text);
   font-size: 1.2rem;
   font-weight: 700;
 }
@@ -41,9 +41,9 @@
 }
 
 .ws-error {
-  background: #FEF2F2;
-  border-color: #FCA5A5;
-  color: #DC2626;
+  background: var(--danger-soft);
+  border-color: #ffc7c2;
+  color: var(--danger-text);
 }
 
 @media (max-width: 480px) {
