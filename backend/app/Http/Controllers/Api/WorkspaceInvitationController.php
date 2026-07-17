@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Models\WorkspaceInvitation;
@@ -74,12 +75,18 @@ class WorkspaceInvitationController extends Controller
             ], 422);
         }
 
-        $invitation = WorkspaceInvitation::create([
-            'workspace_id' => $workspace->id,
-            'invited_by' => $user->id,
-            'email' => $validated['email'],
-            'status' => WorkspaceInvitation::STATUS_PENDING,
-        ]);
+        // updateOrCreate re-opens a previously accepted/declined invitation
+        // instead of violating the (workspace_id, email) unique constraint.
+        $invitation = WorkspaceInvitation::updateOrCreate(
+            [
+                'workspace_id' => $workspace->id,
+                'email' => $validated['email'],
+            ],
+            [
+                'invited_by' => $user->id,
+                'status' => WorkspaceInvitation::STATUS_PENDING,
+            ]
+        );
 
         $invitation->load('inviter:id,name,email');
 
@@ -169,6 +176,15 @@ class WorkspaceInvitationController extends Controller
         $invitation->workspace->members()->syncWithoutDetaching([
             $user->id => ['role' => 'member'],
         ]);
+
+        ActivityLog::record(
+            $invitation->workspace_id,
+            $user->id,
+            ActivityLog::MEMBER_JOINED,
+            'workspace',
+            $invitation->workspace_id,
+            "{$user->name} joined the workspace"
+        );
 
         return response()->json([
             'success' => true,

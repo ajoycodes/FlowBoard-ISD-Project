@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Task;
 use App\Models\Workspace;
 use Illuminate\Http\JsonResponse;
@@ -97,6 +98,15 @@ class TaskController extends Controller
             'deadline' => $validated['deadline'] ?? null,
         ]);
 
+        ActivityLog::record(
+            $workspace->id,
+            $user->id,
+            ActivityLog::TASK_CREATED,
+            'task',
+            $task->id,
+            "Created task \"{$task->title}\""
+        );
+
         return response()->json([
             'success' => true,
             'message' => 'Task created successfully.',
@@ -143,6 +153,8 @@ class TaskController extends Controller
             }
         }
 
+        $previousStatus = $task->status;
+
         $task->update([
             'assigned_to' => array_key_exists('assigned_to', $validated) ? $validated['assigned_to'] : $task->assigned_to,
             'title' => $validated['title'] ?? $task->title,
@@ -152,6 +164,19 @@ class TaskController extends Controller
             'deadline' => array_key_exists('deadline', $validated) ? $validated['deadline'] : $task->deadline,
             'updated_by' => $user->id,
         ]);
+
+        if ($task->status !== $previousStatus) {
+            ActivityLog::record(
+                $task->workspace_id,
+                $user->id,
+                $task->status === Task::STATUS_DONE ? ActivityLog::TASK_COMPLETED : ActivityLog::TASK_MOVED,
+                'task',
+                $task->id,
+                $task->status === Task::STATUS_DONE
+                    ? "Completed task \"{$task->title}\""
+                    : "Moved task \"{$task->title}\" to {$task->status}"
+            );
+        }
 
         return response()->json([
             'success' => true,
@@ -180,10 +205,25 @@ class TaskController extends Controller
             ])],
         ]);
 
+        $previousStatus = $task->status;
+
         $task->update([
             'status' => $validated['status'],
             'updated_by' => $user->id,
         ]);
+
+        if ($task->status !== $previousStatus) {
+            ActivityLog::record(
+                $task->workspace_id,
+                $user->id,
+                $task->status === Task::STATUS_DONE ? ActivityLog::TASK_COMPLETED : ActivityLog::TASK_MOVED,
+                'task',
+                $task->id,
+                $task->status === Task::STATUS_DONE
+                    ? "Completed task \"{$task->title}\""
+                    : "Moved task \"{$task->title}\" to {$task->status}"
+            );
+        }
 
         return response()->json([
             'success' => true,
@@ -241,6 +281,15 @@ class TaskController extends Controller
                 'message' => 'You are not authorized to delete this task.',
             ], 403);
         }
+
+        ActivityLog::record(
+            $task->workspace_id,
+            $user->id,
+            ActivityLog::TASK_DELETED,
+            'task',
+            $task->id,
+            "Deleted task \"{$task->title}\""
+        );
 
         $task->delete();
 

@@ -1,81 +1,32 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+import {
+  getWorkspace,
+  getTasks,
+  createTask,
+  updateTask,
+  updateTaskStatus,
+  assignTask,
+  deleteTask,
+  getInvitations,
+  sendInvitation,
+  deleteInvitation,
+} from '../lib/api'
 import './TaskBoard.css'
 
-const COLUMNS = ['To Do', 'In Progress', 'Done']
+const COLUMNS = [
+  { key: 'todo', label: 'To Do' },
+  { key: 'in_progress', label: 'In Progress' },
+  { key: 'review', label: 'Review' },
+  { key: 'done', label: 'Done' },
+]
 
 const FILTER_TABS = ['All Tasks', 'Assigned to Me', 'High Priority', 'In Progress', 'Completed']
 
-const CURRENT_USER = localStorage.getItem('username') || 'Fariha'
-
-const DEFAULT_ASSIGNEES = ['Fariha', 'Dev 2', 'Dev 3']
-
-const INITIAL_INVITES = [
-  { id: 1, email: 'dev2@flowboard.test', status: 'Pending' },
-  { id: 2, email: 'dev3@flowboard.test', status: 'Accepted' },
-]
-
-const INITIAL_TASKS = [
-  {
-    id: 1,
-    title: 'Activity log API endpoint',
-    description: 'Return workspace activity with actor, action, and timestamp fields.',
-    priority: 'Medium',
-    deadline: '2026-06-10',
-    assignee: 'Dev 3',
-    status: 'To Do',
-  },
-  {
-    id: 2,
-    title: 'Write unit tests',
-    description: 'Cover task creation, update, status movement, and deletion cases.',
-    priority: 'Low',
-    deadline: '2026-06-15',
-    assignee: 'Dev 2',
-    status: 'To Do',
-  },
-  {
-    id: 3,
-    title: 'Design dashboard UI',
-    description: 'Match the dashboard wireframe and keep project cards easy to scan.',
-    priority: 'High',
-    deadline: '2026-06-05',
-    assignee: 'Fariha',
-    status: 'In Progress',
-  },
-  {
-    id: 4,
-    title: 'Set up Oracle schema',
-    description: 'Create workspace, task, note, member, and activity log tables.',
-    priority: 'Medium',
-    deadline: '2026-05-28',
-    assignee: 'Dev 2',
-    status: 'In Progress',
-  },
-  {
-    id: 5,
-    title: 'Implement login page',
-    description: 'Connect login form validation with the auth flow.',
-    priority: 'High',
-    deadline: '2026-06-01',
-    assignee: 'Fariha',
-    status: 'Done',
-  },
-  {
-    id: 6,
-    title: 'Configure Vite project',
-    description: 'Prepare the React app shell, scripts, and initial project structure.',
-    priority: 'Low',
-    deadline: '2026-05-20',
-    assignee: 'Dev 3',
-    status: 'Done',
-  },
-]
-
 function priorityClass(priority) {
   const p = (priority || '').toLowerCase()
-  if (p === 'high') return 'task-badge priority-high'
-  if (p === 'medium') return 'task-badge priority-medium'
-  return 'task-badge priority-low'
+  if (p === 'high') return 'badge badge--high'
+  if (p === 'medium') return 'badge badge--medium'
+  return 'badge badge--low'
 }
 
 function fmtDate(dateStr) {
@@ -88,27 +39,19 @@ function initials(name) {
   return (name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
 }
 
-function getAssigneeOptions(tasks) {
-  const names = new Set([CURRENT_USER, ...DEFAULT_ASSIGNEES])
-  tasks.forEach(task => {
-    if (task.assignee) names.add(task.assignee)
-  })
-  return Array.from(names)
-}
-
-function applyFilter(tasks, tab, search) {
+function applyFilter(tasks, tab, search, username) {
   let result = [...tasks]
 
-  if (tab === 'Assigned to Me') result = result.filter(t => t.assignee === CURRENT_USER)
+  if (tab === 'Assigned to Me') result = result.filter(t => t.assigned_user?.name === username)
   if (tab === 'High Priority') result = result.filter(t => (t.priority || '').toLowerCase() === 'high')
-  if (tab === 'In Progress') result = result.filter(t => t.status === 'In Progress')
-  if (tab === 'Completed') result = result.filter(t => t.status === 'Done')
+  if (tab === 'In Progress') result = result.filter(t => t.status === 'in_progress')
+  if (tab === 'Completed') result = result.filter(t => t.status === 'done')
 
   if (search.trim()) {
     const q = search.trim().toLowerCase()
     result = result.filter(t =>
       t.title.toLowerCase().includes(q) ||
-      (t.assignee || '').toLowerCase().includes(q) ||
+      (t.assigned_user?.name || '').toLowerCase().includes(q) ||
       (t.priority || '').toLowerCase().includes(q)
     )
   }
@@ -116,17 +59,24 @@ function applyFilter(tasks, tab, search) {
   return result
 }
 
-const EMPTY_FORM = { title: '', description: '', priority: 'Medium', deadline: '', assignee: '' }
-
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
-function InviteMemberModal({ invites, onClose, onInvite, onRemove }) {
+function InviteMemberModal({ workspaceId, members, onClose }) {
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
+  const [invites, setInvites] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    getInvitations(workspaceId)
+      .then(result => setInvites(result.data || []))
+      .catch(err => setError(err.message || 'Failed to load invitations.'))
+      .finally(() => setLoading(false))
+  }, [workspaceId])
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const nextEmail = email.trim().toLowerCase()
 
@@ -140,22 +90,33 @@ function InviteMemberModal({ invites, onClose, onInvite, onRemove }) {
       return
     }
 
-    if (invites.some(invite => invite.email.toLowerCase() === nextEmail)) {
-      setError('This member has already been invited.')
-      return
+    try {
+      const result = await sendInvitation(workspaceId, nextEmail)
+      setInvites(prev => [result.data, ...prev.filter(i => i.id !== result.data.id)])
+      setEmail('')
+      setError('')
+    } catch (err) {
+      setError(err.message || 'Failed to send invitation.')
     }
+  }
 
-    onInvite(nextEmail)
-    setEmail('')
-    setError('')
+  const handleRemove = async (invite) => {
+    if (!window.confirm(`Remove the invitation for ${invite.email}?`)) return
+
+    try {
+      await deleteInvitation(workspaceId, invite.id)
+      setInvites(prev => prev.filter(item => item.id !== invite.id))
+    } catch (err) {
+      setError(err.message || 'Failed to remove invitation.')
+    }
   }
 
   return (
-    <div className="task-modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="task-modal invite-modal" role="dialog" aria-modal="true" aria-labelledby="invite-title">
-        <h2 id="invite-title" className="task-modal-title">Invite Member</h2>
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal invite-modal" role="dialog" aria-modal="true" aria-labelledby="invite-title">
+        <h2 id="invite-title" className="modal-title">Invite Member</h2>
 
-        <form className="invite-form" onSubmit={handleSubmit} noValidate>
+        <form className="stack" onSubmit={handleSubmit} noValidate>
           <div className="form-group">
             <label htmlFor="invite-email">Email address</label>
             <div className="invite-email-row">
@@ -167,34 +128,45 @@ function InviteMemberModal({ invites, onClose, onInvite, onRemove }) {
                 placeholder="teammate@example.com"
                 autoFocus
               />
-              <button type="submit" className="primary-btn invite-send-btn">
-                Send Invite
-              </button>
+              <button type="submit" className="primary-btn">Send Invite</button>
             </div>
           </div>
 
-          {error && <p className="hint task-modal-error">{error}</p>}
+          {error && <p className="hint hint--error">{error}</p>}
 
           <div className="invite-list">
             <div className="invite-list-header">
               <span>Members</span>
+              <span>{members.length}</span>
+            </div>
+            {members.map(member => (
+              <div key={member.id} className="invite-row">
+                <span className="invite-avatar">{initials(member.name)}</span>
+                <span className="invite-email">{member.name} · {member.email}</span>
+                <span className="invite-status invite-status--accepted">Member</span>
+              </div>
+            ))}
+
+            <div className="invite-list-header">
+              <span>Invitations</span>
               <span>{invites.length}</span>
             </div>
-
-            {invites.length === 0 ? (
-              <p className="invite-empty">No members invited yet.</p>
+            {loading ? (
+              <p className="invite-empty">Loading…</p>
+            ) : invites.length === 0 ? (
+              <p className="invite-empty">No pending invitations.</p>
             ) : (
               invites.map(invite => (
                 <div key={invite.id} className="invite-row">
                   <span className="invite-avatar">{invite.email[0].toUpperCase()}</span>
                   <span className="invite-email">{invite.email}</span>
-                  <span className={`invite-status invite-status--${invite.status.toLowerCase()}`}>
+                  <span className={`invite-status invite-status--${invite.status}`}>
                     {invite.status}
                   </span>
                   <button
                     type="button"
-                    className="invite-remove-btn"
-                    onClick={() => onRemove(invite.id)}
+                    className="ghost-btn ghost-btn--danger"
+                    onClick={() => handleRemove(invite)}
                     aria-label={`Remove ${invite.email}`}
                   >
                     Remove
@@ -204,7 +176,7 @@ function InviteMemberModal({ invites, onClose, onInvite, onRemove }) {
             )}
           </div>
 
-          <div className="task-modal-actions">
+          <div className="modal-actions">
             <button type="button" className="ghost-btn" onClick={onClose}>Close</button>
           </div>
         </form>
@@ -213,29 +185,47 @@ function InviteMemberModal({ invites, onClose, onInvite, onRemove }) {
   )
 }
 
-function AddTaskModal({ defaultStatus, assigneeOptions, onClose, onAdd }) {
+function AddTaskModal({ defaultStatus, members, onClose, onAdd }) {
   const [form, setForm] = useState({
-    ...EMPTY_FORM,
-    assignee: assigneeOptions[0] || '',
-    status: defaultStatus || 'To Do',
+    title: '',
+    description: '',
+    priority: 'medium',
+    deadline: '',
+    assigned_to: '',
+    status: defaultStatus || 'todo',
   })
   const [error, setError] = useState('')
+  const [saving, setSaving] = useState(false)
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }))
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!form.title.trim()) {
       setError('Task title is required.')
       return
     }
-    onAdd({ ...form, title: form.title.trim(), id: Date.now() })
+
+    try {
+      setSaving(true)
+      await onAdd({
+        title: form.title.trim(),
+        description: form.description || null,
+        priority: form.priority,
+        deadline: form.deadline || null,
+        status: form.status,
+        assigned_to: form.assigned_to ? Number(form.assigned_to) : null,
+      })
+    } catch (err) {
+      setError(err.message || 'Failed to create task.')
+      setSaving(false)
+    }
   }
 
   return (
-    <div className="task-modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="task-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <h2 id="modal-title" className="task-modal-title">Add New Task</h2>
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <h2 id="modal-title" className="modal-title">Add New Task</h2>
 
         <form className="stack" onSubmit={handleSubmit} noValidate>
           <div className="form-group">
@@ -258,22 +248,20 @@ function AddTaskModal({ defaultStatus, assigneeOptions, onClose, onAdd }) {
               value={form.description}
               onChange={e => set('description', e.target.value)}
               placeholder="Optional details..."
-              className="task-modal-textarea"
             />
           </div>
 
-          <div className="task-modal-row">
+          <div className="form-row">
             <div className="form-group">
               <label htmlFor="tb-priority">Priority</label>
               <select
                 id="tb-priority"
                 value={form.priority}
                 onChange={e => set('priority', e.target.value)}
-                className="task-modal-select"
               >
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
               </select>
             </div>
 
@@ -283,14 +271,13 @@ function AddTaskModal({ defaultStatus, assigneeOptions, onClose, onAdd }) {
                 id="tb-status"
                 value={form.status}
                 onChange={e => set('status', e.target.value)}
-                className="task-modal-select"
               >
-                {COLUMNS.map(c => <option key={c}>{c}</option>)}
+                {COLUMNS.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
               </select>
             </div>
           </div>
 
-          <div className="task-modal-row">
+          <div className="form-row">
             <div className="form-group">
               <label htmlFor="tb-deadline">Deadline</label>
               <input
@@ -305,19 +292,21 @@ function AddTaskModal({ defaultStatus, assigneeOptions, onClose, onAdd }) {
               <label htmlFor="tb-assignee">Assignee</label>
               <select
                 id="tb-assignee"
-                value={form.assignee}
-                onChange={e => set('assignee', e.target.value)}
-                className="task-modal-select"
+                value={form.assigned_to}
+                onChange={e => set('assigned_to', e.target.value)}
               >
-                {assigneeOptions.map(name => <option key={name}>{name}</option>)}
+                <option value="">Unassigned</option>
+                {members.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
               </select>
             </div>
           </div>
 
-          {error && <p className="hint task-modal-error">{error}</p>}
+          {error && <p className="hint hint--error">{error}</p>}
 
-          <div className="task-modal-actions">
-            <button type="submit" className="primary-btn">Create Task</button>
+          <div className="modal-actions">
+            <button type="submit" className="primary-btn" disabled={saving}>
+              {saving ? 'Creating…' : 'Create Task'}
+            </button>
             <button type="button" className="ghost-btn" onClick={onClose}>Cancel</button>
           </div>
         </form>
@@ -326,14 +315,10 @@ function AddTaskModal({ defaultStatus, assigneeOptions, onClose, onAdd }) {
   )
 }
 
-function TaskCard({ task, workspaceId, assigneeOptions, onAssign, onUpdate, onMove, onDelete, onNavigate }) {
-  const nextStatus = task.status === 'To Do' ? 'In Progress'
-    : task.status === 'In Progress' ? 'Done'
-    : null
-
-  const prevStatus = task.status === 'Done' ? 'In Progress'
-    : task.status === 'In Progress' ? 'To Do'
-    : null
+function TaskCard({ task, members, onAssign, onUpdate, onMove, onDelete }) {
+  const colIndex = COLUMNS.findIndex(c => c.key === task.status)
+  const prevCol = colIndex > 0 ? COLUMNS[colIndex - 1] : null
+  const nextCol = colIndex >= 0 && colIndex < COLUMNS.length - 1 ? COLUMNS[colIndex + 1] : null
 
   return (
     <div className="task-card">
@@ -344,54 +329,44 @@ function TaskCard({ task, workspaceId, assigneeOptions, onAssign, onUpdate, onMo
       )}
 
       <div className="task-badges">
-        <span className={priorityClass(task.priority)}>{task.priority || 'Low'}</span>
-        <span className="task-badge task-badge-assignee" title={task.assignee || 'Unassigned'}>
-          {initials(task.assignee)}
+        <span className={priorityClass(task.priority)}>{task.priority || 'low'}</span>
+        <span className="task-avatar" title={task.assigned_user?.name || 'Unassigned'}>
+          {initials(task.assigned_user?.name)}
         </span>
       </div>
 
-      <button
-        className="task-notes-btn"
-        onClick={() => onNavigate && onNavigate('notes', workspaceId, task.id)}
-        title="View notes for this task"
-      >
-        View Notes
-      </button>
-
-      <label className="task-assignee-field">
+      <label className="task-field">
         <span>Assignee</span>
         <select
-          value={task.assignee || ''}
-          onChange={e => onAssign(task.id, e.target.value)}
-          className="task-assignee-select"
+          value={task.assigned_user?.id ?? ''}
+          onChange={e => onAssign(task, e.target.value)}
           aria-label={`Assignee for ${task.title}`}
         >
-          {assigneeOptions.map(name => <option key={name}>{name}</option>)}
+          <option value="" disabled>Unassigned</option>
+          {members.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
         </select>
       </label>
 
-      <div className="task-edit-row">
-        <label className="task-edit-field">
+      <div className="task-field-row">
+        <label className="task-field">
           <span>Priority</span>
           <select
-            value={task.priority || 'Low'}
-            onChange={e => onUpdate(task.id, { priority: e.target.value })}
-            className="task-card-select"
+            value={task.priority || 'low'}
+            onChange={e => onUpdate(task, { priority: e.target.value })}
             aria-label={`Priority for ${task.title}`}
           >
-            <option>High</option>
-            <option>Medium</option>
-            <option>Low</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
           </select>
         </label>
 
-        <label className="task-edit-field">
+        <label className="task-field">
           <span>Deadline</span>
           <input
             type="date"
-            value={task.deadline || ''}
-            onChange={e => onUpdate(task.id, { deadline: e.target.value })}
-            className="task-card-date"
+            value={task.deadline ? task.deadline.slice(0, 10) : ''}
+            onChange={e => onUpdate(task, { deadline: e.target.value || null })}
             aria-label={`Deadline for ${task.title}`}
           />
         </label>
@@ -400,28 +375,27 @@ function TaskCard({ task, workspaceId, assigneeOptions, onAssign, onUpdate, onMo
       <p className="task-deadline">{task.deadline ? `Due ${fmtDate(task.deadline)}` : 'No deadline set'}</p>
 
       <div className="task-actions">
-        {prevStatus && (
+        {prevCol && (
           <button
             className="task-btn"
-            onClick={() => onMove(task.id, prevStatus)}
-            title={`Move to ${prevStatus}`}
+            onClick={() => onMove(task, prevCol.key)}
+            title={`Move to ${prevCol.label}`}
           >
-            &lt;- {prevStatus}
+            &larr; {prevCol.label}
           </button>
         )}
-        {nextStatus && (
+        {nextCol && (
           <button
-            className="task-btn task-btn-advance"
-            onClick={() => onMove(task.id, nextStatus)}
-            title={`Move to ${nextStatus}`}
+            className="task-btn task-btn--advance"
+            onClick={() => onMove(task, nextCol.key)}
+            title={`Move to ${nextCol.label}`}
           >
-            {nextStatus} -&gt;
+            {nextCol.label} &rarr;
           </button>
         )}
         <button
-          className="task-btn task-btn-delete"
-          onClick={() => window.confirm(`Delete "${task.title}"?`) && onDelete(task.id)}
-          title="Delete task"
+          className="task-btn task-btn--delete"
+          onClick={() => window.confirm(`Delete "${task.title}"?`) && onDelete(task)}
           aria-label={`Delete ${task.title}`}
         >
           Delete
@@ -432,53 +406,100 @@ function TaskCard({ task, workspaceId, assigneeOptions, onAssign, onUpdate, onMo
 }
 
 export default function TaskBoard({ workspaceId, onNavigate }) {
-  const [tasks, setTasks] = useState(INITIAL_TASKS)
+  const username = localStorage.getItem('username') || 'User'
+  const [workspace, setWorkspace] = useState(null)
+  const [tasks, setTasks] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState('All Tasks')
   const [search, setSearch] = useState('')
   const [modal, setModal] = useState(null)
   const [inviteOpen, setInviteOpen] = useState(false)
-  const [invites, setInvites] = useState(INITIAL_INVITES)
 
-  const assigneeOptions = useMemo(() => getAssigneeOptions(tasks), [tasks])
-  const visibleTasks = applyFilter(tasks, activeTab, search)
+  const members = workspace?.members || []
+  const visibleTasks = applyFilter(tasks, activeTab, search, username)
 
-  const handleAdd = (newTask) => {
-    setTasks(prev => [...prev, newTask])
+  useEffect(() => {
+    if (!workspaceId) return
+
+    async function load() {
+      try {
+        setLoading(true)
+        setError('')
+
+        const [wsResult, taskResult] = await Promise.all([
+          getWorkspace(workspaceId),
+          getTasks(workspaceId),
+        ])
+
+        setWorkspace(wsResult.data)
+        setTasks(taskResult.data || [])
+      } catch (err) {
+        setError(err.message || 'Failed to load the task board.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    load()
+  }, [workspaceId])
+
+  const replaceTask = (updated) => {
+    setTasks(prev => prev.map(t => t.id === updated.id ? { ...t, ...updated } : t))
+  }
+
+  const handleAdd = async (payload) => {
+    const result = await createTask(workspaceId, payload)
+    const created = result.data
+
+    // Refresh so assigned_user relation is populated
+    const taskResult = await getTasks(workspaceId)
+    setTasks(taskResult.data || (created ? [created] : []))
     setModal(null)
   }
 
-  const handleAssign = (id, assignee) => {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, assignee } : t))
+  const handleAssign = async (task, userId) => {
+    if (!userId) return
+    try {
+      await assignTask(task.id, Number(userId))
+      const member = members.find(m => m.id === Number(userId))
+      replaceTask({ ...task, assigned_user: member ? { id: member.id, name: member.name } : task.assigned_user })
+    } catch (err) {
+      setError(err.message || 'Failed to assign task.')
+    }
   }
 
-  const handleUpdateTask = (id, updates) => {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t))
+  const handleUpdateTask = async (task, updates) => {
+    try {
+      const result = await updateTask(task.id, updates)
+      replaceTask({ ...task, ...result.data, assigned_user: task.assigned_user })
+    } catch (err) {
+      setError(err.message || 'Failed to update task.')
+    }
   }
 
-  const handleMove = (id, newStatus) => {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t))
+  const handleMove = async (task, newStatus) => {
+    const previous = task.status
+    replaceTask({ ...task, status: newStatus })
+
+    try {
+      await updateTaskStatus(task.id, newStatus)
+    } catch (err) {
+      replaceTask({ ...task, status: previous })
+      setError(err.message || 'Failed to move task.')
+    }
   }
 
-  const handleDelete = (id) => {
-    setTasks(prev => prev.filter(t => t.id !== id))
+  const handleDelete = async (task) => {
+    try {
+      await deleteTask(task.id)
+      setTasks(prev => prev.filter(t => t.id !== task.id))
+    } catch (err) {
+      setError(err.message || 'Failed to delete task.')
+    }
   }
 
-  const handleInvite = (email) => {
-    setInvites(prev => [
-      { id: Date.now(), email, status: 'Pending' },
-      ...prev,
-    ])
-  }
-
-  const handleRemoveInvite = (id) => {
-    const invite = invites.find(item => item.id === id)
-    if (!invite) return
-    if (!window.confirm(`Remove ${invite.email} from this workspace?`)) return
-
-    setInvites(prev => prev.filter(item => item.id !== id))
-  }
-
-  const wsName = `Workspace #${workspaceId ?? 1}`
+  const wsName = workspace?.name || `Workspace #${workspaceId ?? ''}`
 
   return (
     <div className="board-page">
@@ -486,16 +507,22 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
         <span className="board-brand">FlowBoard</span>
         <div className="board-navbar-right">
           <button
-            className="board-nav-pill board-nav-pill--workspace"
+            className="board-nav-pill"
             onClick={() => onNavigate && onNavigate('dashboard')}
           >
-            &lt;- Dashboard
+            &larr; Dashboard
           </button>
           <button
             className="board-nav-pill"
             onClick={() => onNavigate && onNavigate('activity', workspaceId)}
           >
             Activity Log
+          </button>
+          <button
+            className="board-nav-pill"
+            onClick={() => onNavigate && onNavigate('notes', workspaceId)}
+          >
+            Notes
           </button>
           <button
             className="board-nav-pill board-nav-pill--invite"
@@ -508,6 +535,8 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
 
       <div className="board-content">
         <p className="board-breadcrumb">FlowBoard &rsaquo; {wsName} &rsaquo; Board</p>
+
+        {error && <div className="alert alert--error">{error}</div>}
 
         <div className="board-filter-bar">
           <div className="board-filter-top">
@@ -526,8 +555,8 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
             </div>
 
             <button
-              className="board-add-task-btn"
-              onClick={() => setModal('To Do')}
+              className="primary-btn"
+              onClick={() => setModal('todo')}
             >
               + Add Task
             </button>
@@ -545,52 +574,54 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
           </div>
         </div>
 
-        <div className="board-columns">
-          {COLUMNS.map(col => {
-            const colTasks = visibleTasks.filter(t => t.status === col)
-            return (
-              <div key={col} className="board-column">
-                <div className="board-column-header">
-                  <span className="board-column-title">{col}</span>
-                  <span className="board-column-count">{colTasks.length}</span>
-                </div>
+        {loading ? (
+          <div className="db-empty">Loading tasks…</div>
+        ) : (
+          <div className="board-columns">
+            {COLUMNS.map(col => {
+              const colTasks = visibleTasks.filter(t => t.status === col.key)
+              return (
+                <div key={col.key} className="board-column">
+                  <div className="board-column-header">
+                    <span className="board-column-title">{col.label}</span>
+                    <span className="board-column-count">{colTasks.length}</span>
+                  </div>
 
-                <div className="board-column-cards">
-                  {colTasks.length === 0 ? (
-                    <p className="board-column-empty">No tasks here.</p>
-                  ) : (
-                    colTasks.map(task => (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        workspaceId={workspaceId}
-                        assigneeOptions={assigneeOptions}
-                        onAssign={handleAssign}
-                        onUpdate={handleUpdateTask}
-                        onMove={handleMove}
-                        onDelete={handleDelete}
-                        onNavigate={onNavigate}
-                      />
-                    ))
-                  )}
-                </div>
+                  <div className="board-column-cards">
+                    {colTasks.length === 0 ? (
+                      <p className="board-column-empty">No tasks here.</p>
+                    ) : (
+                      colTasks.map(task => (
+                        <TaskCard
+                          key={task.id}
+                          task={task}
+                          members={members}
+                          onAssign={handleAssign}
+                          onUpdate={handleUpdateTask}
+                          onMove={handleMove}
+                          onDelete={handleDelete}
+                        />
+                      ))
+                    )}
+                  </div>
 
-                <button
-                  className="board-col-add-btn"
-                  onClick={() => setModal(col)}
-                >
-                  + Add Task
-                </button>
-              </div>
-            )
-          })}
-        </div>
+                  <button
+                    className="board-col-add-btn"
+                    onClick={() => setModal(col.key)}
+                  >
+                    + Add Task
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       {modal && (
         <AddTaskModal
           defaultStatus={modal}
-          assigneeOptions={assigneeOptions}
+          members={members}
           onClose={() => setModal(null)}
           onAdd={handleAdd}
         />
@@ -598,10 +629,9 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
 
       {inviteOpen && (
         <InviteMemberModal
-          invites={invites}
+          workspaceId={workspaceId}
+          members={members}
           onClose={() => setInviteOpen(false)}
-          onInvite={handleInvite}
-          onRemove={handleRemoveInvite}
         />
       )}
     </div>

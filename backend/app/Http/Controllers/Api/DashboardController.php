@@ -62,10 +62,13 @@ class DashboardController extends Controller
                 'tasks.updated_by',
                 'tasks.title',
                 'tasks.status',
+                'tasks.priority',
+                'tasks.deadline',
                 'tasks.updated_at',
             ])
             ->with([
                 'project:id,name,workspace_id',
+                'assignedUser:id,name',
             ])
             ->whereHas('workspace.members', function ($query) use ($user) {
                 $query->where('users.id', $user->id);

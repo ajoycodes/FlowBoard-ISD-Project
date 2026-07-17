@@ -5,7 +5,6 @@ export default function RegistrationForm({ onRegistered, onNavigate }) {
   const [form, setForm] = React.useState({
   name: '',
   email: '',
-  role: '',
   password: '',
   confirm: ''
 })
@@ -62,15 +61,9 @@ export default function RegistrationForm({ onRegistered, onNavigate }) {
         </div>
 
         <form className="stack" onSubmit={handleSubmit}>
-          <div className="form-grid two-col">
-            <div className="form-group">
-              <label>Name</label>
-              <input type="text" value={form.name} onChange={e => update('name', e.target.value)} required />
-            </div>
-            <div className="form-group">
-              <label>Role</label>
-              <input type="text" value={form.role} onChange={e => update('role', e.target.value)} required />
-            </div>
+          <div className="form-group">
+            <label>Name</label>
+            <input type="text" value={form.name} onChange={e => update('name', e.target.value)} required />
           </div>
 
           <div className="form-group">

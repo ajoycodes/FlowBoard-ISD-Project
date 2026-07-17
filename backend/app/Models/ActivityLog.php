@@ -12,8 +12,28 @@ class ActivityLog extends Model
     public const TASK_CREATED = 'task_created';
     public const TASK_MOVED = 'task_moved';
     public const TASK_COMPLETED = 'task_completed';
+    public const TASK_DELETED = 'task_deleted';
     public const MEMBER_JOINED = 'member_joined';
     public const PROJECT_CREATED = 'project_created';
+    public const NOTE_CREATED = 'note_created';
+
+    public static function record(
+        int $workspaceId,
+        int $userId,
+        string $action,
+        string $entityType,
+        ?int $entityId,
+        string $description
+    ): self {
+        return self::create([
+            'workspace_id' => $workspaceId,
+            'user_id' => $userId,
+            'action' => $action,
+            'entity_type' => $entityType,
+            'entity_id' => $entityId,
+            'description' => $description,
+        ]);
+    }
 
     protected $fillable = [
         'workspace_id',
