@@ -63,11 +63,12 @@ export default function Login({ onLogin, onNavigate }) {
           </button>
           {status && <p className="hint">{status}</p>}
 
-          <div className="inline-actions">
-            <button type="button" className="ghost-btn" onClick={() => onNavigate('register')}>
+          <div className="auth-links">
+            <button type="button" className="text-link" onClick={() => onNavigate('register')}>
               Create account
             </button>
-            <button type="button" className="ghost-btn" onClick={() => onNavigate('forgot')}>
+            <span className="auth-links-sep">&middot;</span>
+            <button type="button" className="text-link" onClick={() => onNavigate('forgot')}>
               Forgot password
             </button>
           </div>

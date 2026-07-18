@@ -14,6 +14,14 @@ class DashboardTaskResource extends JsonResource
             'workspace_id' => $this->workspace_id,
             'title' => $this->title,
             'status' => $this->status,
+            'priority' => $this->priority,
+            'deadline' => $this->deadline,
+            'assigned_user' => $this->whenLoaded('assignedUser', function () {
+                return $this->assignedUser ? [
+                    'id' => $this->assignedUser->id,
+                    'name' => $this->assignedUser->name,
+                ] : null;
+            }),
             'project' => $this->whenLoaded('project', function () {
                 return $this->project ? [
                     'id' => $this->project->id,

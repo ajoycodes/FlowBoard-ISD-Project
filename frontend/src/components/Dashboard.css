@@ -1,11 +1,11 @@
-/* ── Dashboard ──────────────────────────────────────────── */
+/* ── Dashboard ─────────────────────────────────────────────── */
 .db-breadcrumb {
   margin: 0 0 1.25rem;
   color: var(--text-secondary);
   font-size: .85rem;
 }
 
-/* ── Section headers ──────────────────────────────────────── */
+/* ── Section headers ───────────────────────────────────────── */
 .db-section-header {
   display: flex;
   align-items: center;
@@ -28,61 +28,44 @@
   min-width: 26px;
   height: 26px;
   padding: 0 .45rem;
-  border-radius: var(--radius-lg);
+  border-radius: 999px;
+  background: var(--surface-muted);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-card);
-  background: var(--border);
-  color: var(--text);
+  color: var(--text-secondary);
   font-size: .78rem;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .db-tasks-heading { margin-bottom: .85rem; }
 
-.db-new-btn {
-  font-size: .85rem;
-  padding: .5rem 1.05rem;
-  white-space: nowrap;
-}
-
-/* ── Workspace cards ──────────────────────────────────────── */
+/* ── Workspace cards ───────────────────────────────────────── */
 .db-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-  margin-bottom: 2.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2.2rem;
 }
 
 .db-card {
-  background: #FFFFFF;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.1rem 1.25rem 1rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: .75rem;
-  min-height: 109px;
+  gap: 1rem;
+  padding: 1.2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow .2s var(--ease), transform .2s var(--ease);
 }
 
-/* Loading skeleton */
-.db-card--skeleton {
-  height: 109px;
-  background: linear-gradient(90deg, var(--bg) 25%, #E9EAEC 50%, var(--bg) 75%);
-  background-size: 200% 100%;
-  animation: db-shimmer 1.4s ease-in-out infinite;
-  border-color: var(--border);
+.db-card:hover {
+  box-shadow: var(--shadow-pop);
+  transform: translateY(-1px);
 }
-
-@keyframes db-shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-.db-card-body { flex: 1; }
 
 .db-card-name {
-  margin: 0 0 .3rem;
+  margin: 0 0 .25rem;
   font-size: 1rem;
   font-weight: 600;
   color: var(--text);
@@ -90,213 +73,145 @@
 
 .db-card-stat {
   margin: 0;
-  color: var(--text-secondary);
   font-size: .85rem;
+  color: var(--text-secondary);
 }
 
 .db-card-actions {
   display: flex;
   gap: .5rem;
-  flex-wrap: wrap;
 }
 
-.db-card-btn {
-  font-size: .8rem;
-  padding: .4rem .8rem;
+.db-card-actions .ghost-btn,
+.db-card-open {
+  font-size: .82rem;
+  padding: .45rem .85rem;
 }
 
-.db-card-btn--activity {
-  background: #e9f8ef;
-  color: #248a3d;
-  border-color: #bfe8cd;
-}
-.db-card-btn--activity:hover {
-  background: #e9f8ef;
+.db-card-open { flex: 1; }
+
+/* Destructive action separated below a divider so it doesn't
+   compete visually with the safe Open/Activity buttons above it. */
+.db-card-delete {
+  padding-top: .8rem;
+  border-top: 1px solid var(--border);
+  font-size: .82rem;
+  text-align: left;
 }
 
-.db-delete-btn {
-  border: 1px solid #ffc7c2;
-  border-radius: 10px;
-  padding: .4rem .8rem;
-  background: var(--danger-soft);
-  color: var(--danger-text);
-  font-size: .8rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background .15s, transform .15s;
-}
-.db-delete-btn:hover {
-  background: #ffd9d6;
-  transform: translateY(-1px);
-}
-
-/* ── Empty states ─────────────────────────────────────────── */
-.db-empty {
-  padding: 2rem;
-  text-align: center;
-  color: var(--text-secondary);
-  background: #FFFFFF;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-}
-.db-empty--cards { margin-bottom: 2.25rem; }
-
-/* ── Recent Tasks table ───────────────────────────────────── */
-.db-deadline-section {
-  margin-bottom: 2.25rem;
-}
-
-.db-deadline-header {
-  margin-bottom: .85rem;
-}
+/* ── Deadline list ─────────────────────────────────────────── */
+.db-deadline-section { margin-bottom: 2.2rem; }
 
 .db-deadline-list {
-  background: #FFFFFF;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
 }
 
 .db-deadline-item {
-  display: grid;
-  grid-template-columns: 56px minmax(0, 1fr) auto auto;
+  display: flex;
   align-items: center;
-  gap: .9rem;
-  padding: .85rem 1rem;
-  border-bottom: 1px solid var(--border);
+  gap: 1rem;
+  padding: .8rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
 }
-.db-deadline-item:last-child { border-bottom: none; }
-.db-deadline-item:nth-child(even) { background: var(--surface-muted); }
 
 .db-deadline-date {
-  width: 48px;
-  min-height: 48px;
-  border: 1px solid #c9defb;
-  border-radius: 8px;
-  background: var(--accent-soft);
-  color: var(--accent-text);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-width: 52px;
+  padding: .35rem 0;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--accent-text);
 }
 
 .db-deadline-day {
-  font-size: 1rem;
-  font-weight: 800;
-  line-height: 1;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.1;
 }
 
 .db-deadline-month {
-  margin-top: 3px;
-  font-size: .7rem;
-  font-weight: 800;
+  font-size: .72rem;
+  font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: .04em;
 }
 
 .db-deadline-main {
+  flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: .18rem;
+  gap: .15rem;
 }
 
 .db-deadline-title {
+  font-weight: 600;
   color: var(--text);
-  font-size: .92rem;
-  font-weight: 700;
+  font-size: .95rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .db-deadline-meta {
+  font-size: .82rem;
   color: var(--text-secondary);
-  font-size: .8rem;
 }
 
-.db-tasks-section { margin-top: .25rem; }
-
+/* ── Recent tasks table ────────────────────────────────────── */
 .db-table-wrapper {
-  background: #FFFFFF;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
   overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
 }
 
 .db-table {
   width: 100%;
   border-collapse: collapse;
   font-size: .9rem;
-  min-width: 540px;
-}
-
-.db-table thead tr {
-  background: #FFFFFF;
-  border-bottom: 1px solid var(--border);
 }
 
 .db-table th {
-  padding: .85rem 1rem;
   text-align: left;
-  font-weight: 600;
-  color: var(--text);
+  padding: .75rem 1rem;
   font-size: .78rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: .05em;
+  letter-spacing: .04em;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-muted);
   white-space: nowrap;
 }
 
 .db-table td {
-  padding: .75rem 1rem;
-  color: var(--text);
+  padding: .7rem 1rem;
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
 
-.db-table tbody tr:last-child td { border-bottom: none; }
+.db-table tr:last-child td { border-bottom: none; }
 
-.db-row--alt { background: var(--surface-muted); }
-
-.db-task-title { font-weight: 500; color: var(--text); }
-.db-task-meta  { color: var(--text-secondary); font-size: .85rem; white-space: nowrap; }
-
-/* Status / priority badges */
-.db-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: .28rem .7rem;
-  border-radius: 13.5px;
-  border: 1px solid var(--border);
-  background: #FFFFFF;
-  font-size: .78rem;
-  font-weight: 600;
+.db-task-title {
+  font-weight: 500;
   color: var(--text);
+}
+
+.db-task-meta {
+  color: var(--text-secondary);
   white-space: nowrap;
 }
-.db-badge--done       { background: #e9f8ef; color: #248a3d; }
-.db-badge--inprogress { background: var(--accent-soft); color: var(--accent-text); }
-.db-badge--todo       { background: var(--bg); color: var(--text-secondary); }
-.db-badge--high       { background: #ffe5e3; color: var(--danger-text); }
-.db-badge--medium     { background: #fff3d6; color: #9a6700; }
-.db-badge--low        { background: #e9f8ef; color: #248a3d; }
 
-/* Skeleton for table area */
-.db-table-skeleton {
-  height: 220px;
-  background: linear-gradient(90deg, var(--bg) 25%, #E9EAEC 50%, var(--bg) 75%);
-  background-size: 200% 100%;
-  animation: db-shimmer 1.4s ease-in-out infinite;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-}
-
-/* ── Responsive ───────────────────────────────────────────── */
-@media (max-width: 600px) {
-  .db-section-header { flex-direction: column; align-items: flex-start; }
-  .db-cards-grid     { grid-template-columns: 1fr; }
-  .db-deadline-item  { grid-template-columns: 48px minmax(0, 1fr); }
-  .db-deadline-item .db-badge { grid-column: 2; justify-self: start; }
+.db-table .ghost-btn {
+  font-size: .8rem;
+  padding: .4rem .8rem;
+  white-space: nowrap;
 }

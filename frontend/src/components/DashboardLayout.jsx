@@ -3,10 +3,9 @@ import { logout } from '../lib/api'
 import './DashboardLayout.css'
 
 export default function DashboardLayout({ children, activeNav, onNavigate, workspaceId }) {
-  const wsId    = workspaceId ?? 1
+  const wsId    = workspaceId ?? null
   const username = localStorage.getItem('username') || 'User'
   const initials = username.slice(0, 1).toUpperCase()
-  const role = localStorage.getItem('role') || 'Member'
 
   // Simple user-menu dropdown toggle
   const [menuOpen, setMenuOpen] = useState(false)
@@ -46,7 +45,6 @@ export default function DashboardLayout({ children, activeNav, onNavigate, works
                 <div className="dl-user-menu" role="menu">
                   <div className="dl-menu-info">
                     <span className="dl-menu-name">{username}</span>
-                    <span className="dl-menu-role">{role}</span>
                   </div>
                   <div className="dl-menu-divider" />
                   <button
@@ -85,6 +83,8 @@ export default function DashboardLayout({ children, activeNav, onNavigate, works
             <button
               className={`dl-navlink${activeNav === 'activity' ? ' dl-navlink--active' : ''}`}
               onClick={() => onNavigate('activity', wsId)}
+              disabled={!wsId}
+              title={wsId ? undefined : 'Create a workspace first'}
             >
               <span className="dl-navicon" aria-hidden="true">&#9776;</span>
               Activity
@@ -93,6 +93,8 @@ export default function DashboardLayout({ children, activeNav, onNavigate, works
             <button
               className={`dl-navlink${activeNav === 'notes' ? ' dl-navlink--active' : ''}`}
               onClick={() => onNavigate('notes', wsId)}
+              disabled={!wsId}
+              title={wsId ? undefined : 'Create a workspace first'}
             >
               <span className="dl-navicon" aria-hidden="true">&#9998;</span>
               Notes

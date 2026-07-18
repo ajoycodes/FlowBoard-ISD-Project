@@ -9,6 +9,17 @@ class Project extends Model
 {
     use HasFactory;
 
+    public const STATUS_PLANNING = 'planning';
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_ON_HOLD = 'on_hold';
+    public const STATUS_COMPLETED = 'completed';
+
+    public const ACTIVE_STATUSES = [
+        self::STATUS_PLANNING,
+        self::STATUS_ACTIVE,
+        self::STATUS_ON_HOLD,
+    ];
+
     protected $fillable = [
         'workspace_id',
         'name',

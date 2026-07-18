@@ -170,12 +170,18 @@ class WorkspaceController extends Controller
             ], 422);
         }
 
-        $invitation = \App\Models\WorkspaceInvitation::create([
-            'workspace_id' => $workspace->id,
-            'invited_by' => $request->user()->id,
-            'email' => $validated['email'],
-            'status' => 'pending',
-        ]);
+        // updateOrCreate re-opens a previously accepted/declined invitation
+        // instead of violating the (workspace_id, email) unique constraint.
+        $invitation = \App\Models\WorkspaceInvitation::updateOrCreate(
+            [
+                'workspace_id' => $workspace->id,
+                'email' => $validated['email'],
+            ],
+            [
+                'invited_by' => $request->user()->id,
+                'status' => 'pending',
+            ]
+        );
 
         $invitation->load('inviter:id,name,email');
 

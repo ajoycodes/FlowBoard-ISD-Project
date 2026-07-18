@@ -1,4 +1,4 @@
-/* ── DashboardLayout ────────────────────────────────────── */
+/* ── DashboardLayout ───────────────────────────────────────── */
 .dl-root {
   min-height: 100vh;
   display: flex;
@@ -6,29 +6,25 @@
   background: var(--bg);
 }
 
-/* ── Navbar ──────────────────────────────────────────────── */
+/* ── Navbar ────────────────────────────────────────────────── */
 .dl-navbar {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  height: 64px;
-  background: rgba(255, 255, 255, .72);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  padding: 0 1.5rem;
+  justify-content: space-between;
   gap: 1rem;
-  flex-shrink: 0;
+  padding: .8rem 1.5rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .dl-brand {
-  font-weight: 700;
   font-size: 1.15rem;
-  color: var(--text);
+  font-weight: 700;
   letter-spacing: -.02em;
-  min-width: 130px;
+  color: var(--text);
 }
 
 .dl-navbar-right {
@@ -37,79 +33,78 @@
   gap: .6rem;
 }
 
-/* ── User pill + dropdown ─── */
-.dl-user-wrapper {
-  position: relative;
-}
+/* ── User pill + menu ──────────────────────────────────────── */
+.dl-user-wrapper { position: relative; }
 
 .dl-user-pill {
-  border: none;
-  border-radius: 999px;
-  background: transparent;
-  padding: .35rem .8rem .35rem .4rem;
   display: flex;
   align-items: center;
   gap: .5rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: .3rem .8rem .3rem .3rem;
+  background: var(--surface);
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color .2s var(--ease);
+}
+
+.dl-user-pill:hover { border-color: var(--border-strong); }
+
+.dl-user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: .78rem;
+  font-weight: 700;
+}
+
+.dl-user-name {
   font-size: .88rem;
   font-weight: 500;
   color: var(--text);
-  font-family: inherit;
-  cursor: pointer;
-  transition: background .2s var(--ease);
 }
-.dl-user-pill:hover { background: rgba(0, 0, 0, .05); }
 
 .dl-user-caret {
-  font-size: .65rem;
+  font-size: .7rem;
   color: var(--text-tertiary);
-  margin-left: .1rem;
 }
 
-/* Backdrop (invisible, captures outside clicks) */
 .dl-menu-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 150;
+  z-index: 30;
 }
 
-/* Dropdown menu */
 .dl-user-menu {
   position: absolute;
-  top: calc(100% + 8px);
   right: 0;
-  z-index: 200;
-  background: rgba(255, 255, 255, .92);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  backdrop-filter: saturate(180%) blur(20px);
+  top: calc(100% + 8px);
+  min-width: 190px;
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-pop);
-  min-width: 180px;
-  padding: .45rem 0;
-  animation: menu-pop .18s var(--ease);
-}
-
-@keyframes menu-pop {
-  from { opacity: 0; transform: translateY(-4px) scale(.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  padding: .5rem;
+  z-index: 40;
 }
 
 .dl-menu-info {
-  padding: .6rem 1rem .5rem;
   display: flex;
   flex-direction: column;
   gap: .1rem;
+  padding: .5rem .7rem;
 }
 
 .dl-menu-name {
-  font-weight: 600;
   font-size: .9rem;
+  font-weight: 600;
   color: var(--text);
-}
-
-.dl-menu-role {
-  font-size: .78rem;
-  color: var(--text-secondary);
 }
 
 .dl-menu-divider {
@@ -121,144 +116,121 @@
 .dl-menu-item {
   display: block;
   width: 100%;
-  padding: .55rem 1rem;
   border: none;
+  border-radius: var(--radius-sm);
+  padding: .55rem .7rem;
   background: transparent;
-  font-size: .875rem;
-  font-family: inherit;
   color: var(--text);
+  font-size: .88rem;
+  font-family: inherit;
   text-align: left;
   cursor: pointer;
-  transition: background .15s var(--ease);
+  transition: background .2s var(--ease);
 }
-.dl-menu-item:hover { background: rgba(0, 0, 0, .045); }
+
+.dl-menu-item:hover { background: var(--surface-muted); }
+
 .dl-menu-item--danger { color: var(--danger-text); }
 .dl-menu-item--danger:hover { background: var(--danger-soft); }
 
-.dl-user-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #d8e6f5 0%, #c4d5ea 100%);
-  border: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: .74rem;
-  font-weight: 600;
-  color: #3a5878;
-  flex-shrink: 0;
-}
-
 .dl-logout-btn {
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   border-radius: 999px;
   padding: .45rem 1rem;
-  background: transparent;
-  color: var(--text);
+  background: var(--surface);
+  color: var(--text-secondary);
   font-size: .85rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: background .2s var(--ease), border-color .2s var(--ease);
+  transition: color .2s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
 }
+
 .dl-logout-btn:hover {
-  background: rgba(0, 0, 0, .04);
-  border-color: var(--text-tertiary);
+  color: var(--danger-text);
+  border-color: var(--danger-text);
+  background: var(--danger-soft);
 }
 
-/* ── Body ────────────────────────────────────────────────── */
+/* ── Body: sidebar + main ──────────────────────────────────── */
 .dl-body {
-  display: flex;
   flex: 1;
-  min-height: 0;
+  display: grid;
+  grid-template-columns: 210px 1fr;
 }
 
-/* ── Sidebar ─────────────────────────────────────────────── */
 .dl-sidebar {
-  width: 230px;
-  min-width: 230px;
-  background: transparent;
   border-right: 1px solid var(--border);
-  padding: 1.5rem 1rem;
-  flex-shrink: 0;
+  background: var(--surface);
+  padding: 1.2rem .8rem;
 }
 
 .dl-sidenav {
   display: flex;
   flex-direction: column;
-  gap: .25rem;
+  gap: .3rem;
+  position: sticky;
+  top: 76px;
 }
 
 .dl-navlink {
   display: flex;
   align-items: center;
-  gap: .65rem;
-  padding: .65rem .9rem;
+  gap: .6rem;
+  width: 100%;
   border: none;
   border-radius: var(--radius-sm);
+  padding: .6rem .8rem;
   background: transparent;
   color: var(--text-secondary);
-  font-size: .92rem;
+  font-size: .9rem;
   font-weight: 500;
   font-family: inherit;
   text-align: left;
   cursor: pointer;
   transition: background .2s var(--ease), color .2s var(--ease);
-  width: 100%;
 }
-.dl-navlink:hover:not(.dl-navlink--disabled) {
-  background: rgba(0, 0, 0, .05);
+
+.dl-navlink:hover:not(:disabled) {
+  background: var(--surface-muted);
   color: var(--text);
 }
+
 .dl-navlink--active {
-  background: var(--surface);
-  color: var(--text);
-  font-weight: 600;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, .05), 0 2px 8px rgba(0, 0, 0, .04);
+  background: var(--accent-soft);
+  color: var(--accent-text);
 }
-.dl-navlink--disabled {
-  color: var(--text-tertiary);
-  cursor: default;
+
+.dl-navlink:disabled {
+  opacity: .45;
+  cursor: not-allowed;
 }
 
 .dl-navicon {
-  font-size: 1rem;
-  width: 18px;
+  font-size: .95rem;
+  width: 1.1rem;
   text-align: center;
-  flex-shrink: 0;
 }
 
-/* ── Main content ────────────────────────────────────────── */
 .dl-main {
-  flex: 1;
-  padding: 2rem 2.25rem;
+  padding: 1.6rem;
   min-width: 0;
-  overflow-y: auto;
 }
 
-/* ── Responsive ──────────────────────────────────────────── */
-@media (max-width: 900px) {
-  .dl-sidebar { width: 190px; min-width: 190px; }
-}
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 760px) {
+  .dl-body { grid-template-columns: 1fr; }
 
-@media (max-width: 768px) {
-  .dl-body { flex-direction: column; }
   .dl-sidebar {
-    width: 100%; min-width: unset;
     border-right: none;
     border-bottom: 1px solid var(--border);
-    padding: .75rem 1rem;
+    padding: .6rem .8rem;
   }
-  .dl-sidenav { flex-direction: row; flex-wrap: wrap; }
-  .dl-navlink { width: auto; padding: .5rem .75rem; }
-  .dl-main { padding: 1rem 1rem 1.5rem; }
-  .dl-navbar { padding: 0 1rem; }
-}
 
-@media (max-width: 480px) {
-  .dl-brand     { font-size: 1.1rem; }
+  .dl-sidenav {
+    flex-direction: row;
+    position: static;
+  }
+
   .dl-user-name { display: none; }
-  .dl-user-caret{ display: none; }
-  .dl-navbar    { gap: .5rem; }
 }

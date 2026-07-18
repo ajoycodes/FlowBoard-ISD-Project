@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Note;
 use App\Models\Workspace;
 use Illuminate\Http\JsonResponse;
@@ -63,6 +64,15 @@ class NoteController extends Controller
         ]);
 
         $note->load('user:id,name,email');
+
+        ActivityLog::record(
+            $workspace->id,
+            $user->id,
+            ActivityLog::NOTE_CREATED,
+            'note',
+            $note->id,
+            'Created a note'
+        );
 
         return response()->json([
             'success' => true,

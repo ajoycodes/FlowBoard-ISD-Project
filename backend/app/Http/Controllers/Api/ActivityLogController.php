@@ -50,7 +50,7 @@ class ActivityLogController extends Controller
 
 
 
-        $perPage = $request->query('per_page', 10);
+        $perPage = min(max((int) $request->query('per_page', 10), 1), 100);
 
         $query = $workspace->activityLogs()
             ->select([

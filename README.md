@@ -20,9 +20,9 @@ FlowBoard helps teams manage projects, track tasks, monitor progress, and collab
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | React.js (Vite) |
-| Backend | Laravel (PHP) |
-| Database | Oracle |
+| Frontend | React 18 (Vite) |
+| Backend | Laravel 12 (PHP) |
+| Database | SQLite (development) / Oracle (production) |
 | Auth | Laravel Sanctum (token-based) |
 | Version Control | Git / GitHub |
 | Project Tracking | Jira (Scrum board) |
@@ -33,15 +33,14 @@ FlowBoard helps teams manage projects, track tasks, monitor progress, and collab
 
 - ✅ User registration, login, logout
 - ✅ Password reset via email
-- ✅ Personal dashboard with active projects and recent tasks
+- ✅ Personal dashboard with workspaces, deadline-sorted tasks, and recent tasks
 - ✅ Workspace creation and management
-- ✅ Kanban task board (To Do / In Progress / Done)
-- ✅ Activity log per workspace
-- 🔲 Task assignment to team members
-- 🔲 Deadlines and priority levels on tasks
-- 🔲 Notes system per workspace
-- 🔲 Team member invite and removal
-- 🔲 Activity log date filtering
+- ✅ Kanban task board (To Do / In Progress / Review / Done)
+- ✅ Task assignment, priorities, and deadlines
+- ✅ Workspace member invitations (send / accept / decline / revoke)
+- ✅ Project management with project invitations
+- ✅ Workspace notes with autosave
+- ✅ Activity log per workspace (task created/moved/completed, member joined, project and note creation) with date filtering
 
 ---
 
@@ -53,15 +52,18 @@ FlowBoard/
 │   ├── app/
 │   │   ├── Http/Controllers/Api/
 │   │   │   ├── AuthController.php
+│   │   │   ├── DashboardController.php
 │   │   │   ├── WorkspaceController.php
+│   │   │   ├── WorkspaceInvitationController.php
 │   │   │   ├── TaskController.php
 │   │   │   ├── ProjectController.php
-│   │   │   ├── DashboardController.php
+│   │   │   ├── ProjectInvitationController.php
+│   │   │   ├── NoteController.php
 │   │   │   └── ActivityLogController.php
 │   │   └── Models/
 │   ├── database/migrations/
 │   └── routes/api.php
-├── frontend/                 # React.js frontend
+├── frontend/                 # React frontend
 │   └── src/
 │       ├── components/
 │       │   ├── Login.jsx
@@ -71,9 +73,11 @@ FlowBoard/
 │       │   ├── DashboardLayout.jsx
 │       │   ├── TaskBoard.jsx
 │       │   ├── Workspace.jsx
+│       │   ├── NotesEditor.jsx
 │       │   └── ActivityLog.jsx
-│       ├── lib/api.js
-│       └── App.jsx
+│       ├── lib/api.js        # API client (all backend calls)
+│       ├── App.jsx           # Router / auth shell
+│       └── App.css           # Shared design tokens & primitives
 └── README.md
 ```
 
@@ -83,11 +87,9 @@ FlowBoard/
 
 ### Prerequisites
 
-- PHP >= 8.1
+- PHP >= 8.2
 - Composer
 - Node.js >= 18
-- Oracle Database
-- Oracle PDO driver for PHP
 
 ### Backend Setup
 
@@ -95,51 +97,81 @@ FlowBoard/
 cd backend
 composer install
 cp .env.example .env
-# Configure your Oracle DB credentials in .env
 php artisan key:generate
+touch database/database.sqlite   # SQLite is the default for local development
 php artisan migrate
-php artisan serve
+php artisan serve                # http://127.0.0.1:8000
 ```
 
-> **Local development without Oracle:** set `DB_CONNECTION=sqlite` in
-> `.env` (and remove the other `DB_*` lines), create an empty
-> `database/database.sqlite` file, then run `php artisan migrate`.
+> **Using Oracle instead:** set `DB_CONNECTION=oracle` plus the `DB_HOST` /
+> `DB_PORT` / `DB_DATABASE` / `DB_USERNAME` / `DB_PASSWORD` values in `.env`
+> (requires the Oracle PDO driver), then run `php artisan migrate`.
 
 ### Frontend Setup
 
 ```bash
 cd frontend
 npm install
-npm run dev
+npm run dev                      # http://localhost:5173
 ```
 
-The frontend runs on `http://localhost:5173` and proxies API requests to the Laravel backend at `http://localhost:8000`.
+The frontend calls the Laravel API at `http://127.0.0.1:8000/api` by default.
+Override with `VITE_API_BASE_URL` in `frontend/.env` if your backend runs elsewhere.
 
 ---
 
 ## API Overview
 
+All protected routes require an `Authorization: Bearer {token}` header.
+
+### Auth
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | /api/register | Register a new user |
 | POST | /api/login | Login and receive token |
-| POST | /api/logout | Invalidate session token |
+| POST | /api/logout | Invalidate current token |
+| GET | /api/user | Current user profile |
 | POST | /api/forgot-password | Send password reset email |
 | POST | /api/reset-password | Reset password with token |
+
+### Dashboard & Workspaces
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/dashboard | Active projects, recent tasks, deadline-sorted tasks |
 | GET | /api/workspaces | List user workspaces |
-| POST | /api/workspaces | Create new workspace |
-| GET | /api/workspaces/{id} | Get workspace details |
+| POST | /api/workspaces | Create workspace |
+| GET | /api/workspaces/{id} | Workspace details (members, projects, tasks) |
 | PUT | /api/workspaces/{id} | Update workspace |
 | DELETE | /api/workspaces/{id} | Delete workspace |
-| POST | /api/workspaces/{id}/members | Add member by email |
 | DELETE | /api/workspaces/{id}/members/{userId} | Remove member |
-| GET | /api/tasks | Get tasks |
-| POST | /api/tasks | Create a task |
-| PUT | /api/tasks/{id} | Update task |
-| DELETE | /api/tasks/{id} | Delete task |
-| GET | /api/workspaces/{id}/activity-logs | Get activity logs |
 
-All protected routes require `Authorization: Bearer {token}` header.
+### Invitations
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET / POST | /api/workspaces/{id}/invitations | List / send workspace invitations |
+| DELETE | /api/workspaces/{id}/invitations/{invId} | Revoke invitation |
+| GET | /api/invitations/my | Invitations for the current user |
+| POST | /api/invitations/{id}/accept · /decline | Respond to invitation |
+| GET / POST | /api/projects/{id}/invitations | List / send project invitations |
+| GET | /api/project-invitations/my | Project invitations for current user |
+| POST | /api/project-invitations/{id}/accept · /decline | Respond |
+
+### Tasks, Projects, Notes, Activity
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET / POST | /api/workspaces/{id}/tasks | List / create tasks |
+| PUT / DELETE | /api/tasks/{id} | Update / delete task |
+| PATCH | /api/tasks/{id}/status | Move task between columns |
+| PATCH | /api/tasks/{id}/assign | Assign task to member |
+| GET / POST | /api/projects | List / create projects |
+| GET / PUT / DELETE | /api/projects/{id} | Project CRUD |
+| GET / POST | /api/workspaces/{id}/notes | List / create notes |
+| GET / PUT / DELETE | /api/workspaces/{id}/notes/{noteId} | Note CRUD |
+| GET | /api/workspaces/{id}/activity | Paginated activity log (`from`, `to`, `per_page`) |
 
 ---
 
@@ -165,9 +197,12 @@ main                    ← production-ready
 |-------|---------|
 | users | Registered users |
 | workspaces | Project workspaces |
-| workspace_user | Team membership (pivot) |
+| workspace_user | Team membership (pivot, with role) |
+| workspace_invitations | Pending / accepted / declined workspace invites |
 | projects | Projects within workspaces |
-| tasks | Kanban tasks |
+| project_invitations | Project-level invites |
+| tasks | Kanban tasks (status, priority, deadline, assignee) |
+| notes | Workspace notes |
 | activity_logs | Workspace event tracking |
 | password_reset_tokens | Password reset flow |
 

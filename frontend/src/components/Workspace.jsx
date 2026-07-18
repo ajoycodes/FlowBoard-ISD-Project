@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { createWorkspace } from '../lib/api'
-import './Workspace.css'
 
 export default function Workspace({ onClose, onCreated }) {
   const [name,  setName]  = useState('')
@@ -34,14 +33,14 @@ export default function Workspace({ onClose, onCreated }) {
 }
 
   return (
-    <div className="ws-overlay" onClick={handleOverlayClick} role="presentation">
+    <div className="modal-overlay" onClick={handleOverlayClick} role="presentation">
       <div
-        className="ws-modal"
+        className="modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="ws-modal-title"
       >
-        <h2 id="ws-modal-title" className="ws-modal-title">Create Workspace</h2>
+        <h2 id="ws-modal-title" className="modal-title">Create Workspace</h2>
 
         <form className="stack" onSubmit={handleSubmit} noValidate>
           <div className="form-group">
@@ -56,9 +55,9 @@ export default function Workspace({ onClose, onCreated }) {
             />
           </div>
 
-          {error && <p className="hint ws-error">{error}</p>}
+          {error && <p className="hint hint--error">{error}</p>}
 
-          <div className="ws-modal-actions">
+          <div className="modal-actions">
             <button className="primary-btn" type="submit" disabled={loading}>
   {loading ? 'Creating...' : 'Create'}
 </button>

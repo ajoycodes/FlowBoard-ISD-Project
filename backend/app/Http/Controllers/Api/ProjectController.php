@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Project;
 use App\Models\Workspace;
 use Illuminate\Http\Request;
@@ -56,6 +57,15 @@ class ProjectController extends Controller
             'workspace_id' => $validated['workspace_id'],
             'created_by' => $request->user()->id,
         ]);
+
+        ActivityLog::record(
+            $workspace->id,
+            $request->user()->id,
+            ActivityLog::PROJECT_CREATED,
+            'project',
+            $project->id,
+            "Created project \"{$project->name}\""
+        );
 
         return response()->json([
             'success' => true,

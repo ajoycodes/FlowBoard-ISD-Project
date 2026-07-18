@@ -1,22 +1,16 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { getNotes, createNote, updateNote, deleteNote } from '../lib/api'
 import DashboardLayout from './DashboardLayout'
 import './NotesEditor.css'
 
-const WORKSPACE_TASKS = [
-  { id: 1, title: 'Activity log API endpoint', status: 'To Do', assignee: 'Dev 3' },
-  { id: 2, title: 'Write unit tests', status: 'To Do', assignee: 'Dev 2' },
-  { id: 3, title: 'Design dashboard UI', status: 'In Progress', assignee: 'Fariha' },
-  { id: 4, title: 'Set up Oracle schema', status: 'In Progress', assignee: 'Dev 2' },
-  { id: 5, title: 'Implement login page', status: 'Done', assignee: 'Fariha' },
-  { id: 6, title: 'Configure Vite project', status: 'Done', assignee: 'Dev 3' },
-]
-
-function storageKey(workspaceId) {
-  return `flowboard-notes-${workspaceId ?? 1}`
+function noteTitle(content) {
+  const firstLine = (content || '').split('\n')[0].trim()
+  return firstLine || 'Untitled note'
 }
 
-function nowLabel() {
-  return new Date().toLocaleString([], {
+function formatTimestamp(ts) {
+  const d = new Date(ts)
+  return isNaN(d.getTime()) ? ts : d.toLocaleString([], {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -25,141 +19,88 @@ function nowLabel() {
   })
 }
 
-function taskTitle(taskId) {
-  return WORKSPACE_TASKS.find(task => task.id === taskId)?.title || 'Unassigned task'
-}
+export default function NotesEditor({ workspaceId, onNavigate }) {
+  const [notes, setNotes] = useState([])
+  const [selectedId, setSelectedId] = useState(null)
+  const [draft, setDraft] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const saveTimer = useRef(null)
 
-function defaultNotes(workspaceId) {
-  const author = localStorage.getItem('username') || 'User'
-
-  return [
-    {
-      id: 1,
-      task_id: 5,
-      title: 'Login validation checklist',
-      content: 'Confirm email validation, password required state, and successful redirect back to the dashboard.',
-      updated_at: nowLabel(),
-      author,
-      workspace_id: workspaceId ?? 1,
-    },
-    {
-      id: 2,
-      task_id: 3,
-      title: 'Dashboard UI notes',
-      content: 'Keep project cards compact, use light borders, and make the primary workspace actions easy to scan.',
-      updated_at: nowLabel(),
-      author,
-      workspace_id: workspaceId ?? 1,
-    },
-    {
-      id: 3,
-      task_id: 1,
-      title: 'Activity endpoint fields',
-      content: 'Return actor, action, task title, and timestamp so the activity log can be filtered cleanly.',
-      updated_at: nowLabel(),
-      author,
-      workspace_id: workspaceId ?? 1,
-    },
-  ]
-}
-
-function normalizeNotes(notes) {
-  return notes.map((note, index) => ({
-    ...note,
-    task_id: note.task_id ?? WORKSPACE_TASKS[index % WORKSPACE_TASKS.length].id,
-  }))
-}
-
-function loadNotes(workspaceId) {
-  try {
-    const saved = localStorage.getItem(storageKey(workspaceId))
-    return saved ? normalizeNotes(JSON.parse(saved)) : defaultNotes(workspaceId)
-  } catch {
-    return defaultNotes(workspaceId)
-  }
-}
-
-export default function NotesEditor({ workspaceId, taskId: initialTaskId, onNavigate }) {
-  const username = localStorage.getItem('username') || 'User'
-  const isTaskScoped = initialTaskId !== null && initialTaskId !== undefined
-  const [notes, setNotes] = useState(() => loadNotes(workspaceId))
-  const [selectedTaskId, setSelectedTaskId] = useState(initialTaskId ?? 'all')
-  const filteredNotes = useMemo(() => (
-    selectedTaskId === 'all'
-      ? notes
-      : notes.filter(note => note.task_id === selectedTaskId)
-  ), [notes, selectedTaskId])
-  const [selectedId, setSelectedId] = useState(() => filteredNotes[0]?.id ?? null)
   const selectedNote = notes.find(note => note.id === selectedId) ?? null
-  const wsName = `Workspace #${workspaceId ?? 1}`
-
-  const noteCount = filteredNotes.length
-
-  const persist = (nextNotes) => {
-    setNotes(nextNotes)
-    localStorage.setItem(storageKey(workspaceId), JSON.stringify(nextNotes))
-  }
-
-  const chooseTask = (taskId) => {
-    const nextFiltered = taskId === 'all'
-      ? notes
-      : notes.filter(note => note.task_id === taskId)
-
-    setSelectedTaskId(taskId)
-    setSelectedId(nextFiltered[0]?.id ?? null)
-  }
 
   useEffect(() => {
-    if (initialTaskId) chooseTask(initialTaskId)
-  }, [initialTaskId])
+    if (!workspaceId) return
 
-  const handleCreate = () => {
-    const targetTaskId = isTaskScoped
-      ? initialTaskId
-      : selectedTaskId === 'all'
-        ? WORKSPACE_TASKS[0].id
-        : selectedTaskId
-    const note = {
-      id: Date.now(),
-      task_id: targetTaskId,
-      title: 'Untitled note',
-      content: '',
-      updated_at: nowLabel(),
-      author: username,
-      workspace_id: workspaceId ?? 1,
-    }
+    getNotes(workspaceId)
+      .then(result => {
+        const list = result.data || []
+        setNotes(list)
+        setSelectedId(list[0]?.id ?? null)
+        setDraft(list[0]?.content ?? '')
+      })
+      .catch(err => setError(err.message || 'Failed to load notes.'))
+      .finally(() => setLoading(false))
+  }, [workspaceId])
 
-    persist([note, ...notes])
-    setSelectedTaskId(targetTaskId)
+  const choose = (note) => {
     setSelectedId(note.id)
+    setDraft(note.content || '')
   }
 
-  const updateSelected = (field, value) => {
-    if (!selectedNote) return
-    if (isTaskScoped && field === 'task_id') return
+  const handleCreate = async () => {
+    try {
+      const result = await createNote(workspaceId, 'Untitled note')
+      const note = result.data
 
-    persist(notes.map(note => (
-      note.id === selectedNote.id
-        ? { ...note, [field]: value, updated_at: nowLabel(), author: username }
-        : note
-    )))
-
-    if (field === 'task_id') {
-      setSelectedTaskId(value)
+      setNotes(prev => [note, ...prev])
+      setSelectedId(note.id)
+      setDraft(note.content)
+    } catch (err) {
+      setError(err.message || 'Failed to create note.')
     }
   }
 
-  const handleDelete = (noteToDelete = selectedNote) => {
-    if (!noteToDelete) return
-    if (!window.confirm(`Delete "${noteToDelete.title || 'Untitled note'}"?`)) return
+  const persistDraft = async (noteId, content) => {
+    try {
+      setSaving(true)
+      const result = await updateNote(workspaceId, noteId, content)
+      setNotes(prev => prev.map(note => note.id === noteId ? result.data : note))
+    } catch (err) {
+      setError(err.message || 'Failed to save note.')
+    } finally {
+      setSaving(false)
+    }
+  }
 
-    const nextNotes = notes.filter(note => note.id !== noteToDelete.id)
-    const nextFiltered = selectedTaskId === 'all'
-      ? nextNotes
-      : nextNotes.filter(note => note.task_id === selectedTaskId)
+  const handleChange = (value) => {
+    setDraft(value)
+    if (!selectedNote) return
 
-    persist(nextNotes)
-    setSelectedId(noteToDelete.id === selectedId ? nextFiltered[0]?.id ?? null : selectedId)
+    // Debounced autosave
+    if (saveTimer.current) clearTimeout(saveTimer.current)
+    saveTimer.current = setTimeout(() => persistDraft(selectedNote.id, value), 600)
+  }
+
+  useEffect(() => () => saveTimer.current && clearTimeout(saveTimer.current), [])
+
+  const handleDelete = async (note = selectedNote) => {
+    if (!note) return
+    if (!window.confirm(`Delete "${noteTitle(note.content)}"?`)) return
+
+    try {
+      await deleteNote(workspaceId, note.id)
+      const next = notes.filter(item => item.id !== note.id)
+      setNotes(next)
+
+      if (note.id === selectedId) {
+        setSelectedId(next[0]?.id ?? null)
+        setDraft(next[0]?.content ?? '')
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to delete note.')
+    }
   }
 
   return (
@@ -167,81 +108,52 @@ export default function NotesEditor({ workspaceId, taskId: initialTaskId, onNavi
       <div className="notes-page">
         <div className="notes-header">
           <div>
-            <p className="notes-breadcrumb">FlowBoard &rsaquo; {wsName} &rsaquo; Notes</p>
-            <h1 className="notes-title">
-              {isTaskScoped ? taskTitle(initialTaskId) : 'Task Notes'}
-            </h1>
+            <p className="notes-breadcrumb">FlowBoard &rsaquo; Notes</p>
+            <h1 className="notes-title">Workspace Notes</h1>
           </div>
-          <button className="notes-create-btn" onClick={handleCreate}>
+          <button className="primary-btn" onClick={handleCreate}>
             + New Note
           </button>
         </div>
 
+        {error && <div className="alert alert--error">{error}</div>}
+
         <div className="notes-shell">
-          <aside className="notes-task-filter" aria-label="Filter notes by task">
+          <aside className="notes-list" aria-label="Workspace notes">
             <div className="notes-list-header">
-              <span>Tasks</span>
+              <span>Notes</span>
               <span className="notes-count">{notes.length}</span>
             </div>
 
-            {!isTaskScoped && (
-              <button
-                className={`notes-task-btn${selectedTaskId === 'all' ? ' notes-task-btn--active' : ''}`}
-                onClick={() => chooseTask('all')}
-              >
-                <span className="notes-task-title">All Tasks</span>
-                <span className="notes-task-count">{notes.length}</span>
-              </button>
-            )}
-
-            {WORKSPACE_TASKS
-              .filter(task => !isTaskScoped || task.id === initialTaskId)
-              .map(task => {
-              const count = notes.filter(note => note.task_id === task.id).length
-
-              return (
-                <button
-                  key={task.id}
-                  className={`notes-task-btn${selectedTaskId === task.id ? ' notes-task-btn--active' : ''}`}
-                  onClick={() => chooseTask(task.id)}
-                >
-                  <span className="notes-task-title">{task.title}</span>
-                  <span className="notes-task-meta">{task.status} • {count} note{count === 1 ? '' : 's'}</span>
-                </button>
-              )
-            })}
-          </aside>
-
-          <aside className="notes-list" aria-label="Task notes">
-            <div className="notes-list-header">
-              <span>Notes</span>
-              <span className="notes-count">{noteCount}</span>
-            </div>
-
-            {filteredNotes.length === 0 ? (
-              <p className="notes-empty">No notes for this task yet.</p>
+            {loading ? (
+              <p className="notes-empty">Loading…</p>
+            ) : notes.length === 0 ? (
+              <p className="notes-empty">No notes yet. Create the first one.</p>
             ) : (
-              filteredNotes.map(note => (
+              notes.map(note => (
                 <div
                   key={note.id}
                   className={`notes-list-item${note.id === selectedId ? ' notes-list-item--active' : ''}`}
                 >
                   <button
                     className="notes-list-main"
-                    onClick={() => setSelectedId(note.id)}
+                    onClick={() => choose(note)}
                   >
-                    <span className="notes-list-title">{note.title || 'Untitled note'}</span>
-                    <span className="notes-list-task">{taskTitle(note.task_id)}</span>
-                    <span className="notes-list-preview">{note.content || 'Empty note'}</span>
-                    <span className="notes-list-meta">{note.updated_at}</span>
+                    <span className="notes-list-title">{noteTitle(note.content)}</span>
+                    <span className="notes-list-preview">
+                      {(note.content || '').split('\n').slice(1).join(' ').trim() || 'Empty note'}
+                    </span>
+                    <span className="notes-list-meta">
+                      {note.user?.name ? `${note.user.name} · ` : ''}{formatTimestamp(note.updated_at)}
+                    </span>
                   </button>
                   <button
                     className="notes-list-delete"
                     onClick={() => handleDelete(note)}
-                    aria-label={`Delete ${note.title || 'Untitled note'}`}
+                    aria-label={`Delete ${noteTitle(note.content)}`}
                     title="Delete note"
                   >
-                    Delete
+                    &times;
                   </button>
                 </div>
               ))
@@ -252,54 +164,31 @@ export default function NotesEditor({ workspaceId, taskId: initialTaskId, onNavi
             {selectedNote ? (
               <>
                 <div className="notes-editor-top">
-                  <input
-                    className="notes-title-input"
-                    value={selectedNote.title}
-                    onChange={e => updateSelected('title', e.target.value)}
-                    aria-label="Note title"
-                    placeholder="Note title"
-                  />
-                  <button className="notes-delete-btn" onClick={handleDelete}>
+                  <h2 className="notes-editor-title">{noteTitle(draft)}</h2>
+                  <button className="ghost-btn ghost-btn--danger" onClick={() => handleDelete()}>
                     Delete
                   </button>
                 </div>
 
-                {isTaskScoped ? (
-                  <div className="notes-task-select-field">
-                    <span>Task</span>
-                    <span className="notes-task-locked">{taskTitle(initialTaskId)}</span>
-                  </div>
-                ) : (
-                  <label className="notes-task-select-field">
-                    <span>Task</span>
-                    <select
-                      className="notes-task-select"
-                      value={selectedNote.task_id}
-                      onChange={e => updateSelected('task_id', Number(e.target.value))}
-                    >
-                      {WORKSPACE_TASKS.map(task => (
-                        <option key={task.id} value={task.id}>{task.title}</option>
-                      ))}
-                    </select>
-                  </label>
-                )}
-
                 <textarea
                   className="notes-content-input"
-                  value={selectedNote.content}
-                  onChange={e => updateSelected('content', e.target.value)}
+                  value={draft}
+                  onChange={e => handleChange(e.target.value)}
                   aria-label="Note content"
-                  placeholder="Write task notes here..."
+                  placeholder="Write your note here… The first line becomes its title."
                 />
 
                 <div className="notes-editor-footer">
-                  <span>Edited by {selectedNote.author}</span>
-                  <span>{selectedNote.updated_at}</span>
+                  <span>
+                    {selectedNote.user?.name ? `By ${selectedNote.user.name}` : ''}
+                  </span>
+                  <span>{saving ? 'Saving…' : `Updated ${formatTimestamp(selectedNote.updated_at)}`}</span>
                 </div>
               </>
             ) : (
               <div className="notes-editor-empty">
-                <button className="notes-create-btn" onClick={handleCreate}>
+                <p>Select a note or create a new one.</p>
+                <button className="primary-btn" onClick={handleCreate}>
                   + New Note
                 </button>
               </div>

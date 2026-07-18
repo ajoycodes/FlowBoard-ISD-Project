@@ -82,12 +82,18 @@ class ProjectInvitationController extends Controller
             ], 422);
         }
 
-        $invitation = ProjectInvitation::create([
-            'project_id' => $project->id,
-            'invited_by' => $user->id,
-            'email' => $validated['email'],
-            'status' => ProjectInvitation::STATUS_PENDING,
-        ]);
+        // updateOrCreate re-opens a previously accepted/declined invitation
+        // instead of violating the (project_id, email) unique constraint.
+        $invitation = ProjectInvitation::updateOrCreate(
+            [
+                'project_id' => $project->id,
+                'email' => $validated['email'],
+            ],
+            [
+                'invited_by' => $user->id,
+                'status' => ProjectInvitation::STATUS_PENDING,
+            ]
+        );
 
         $invitation->load('inviter:id,name,email');
 
