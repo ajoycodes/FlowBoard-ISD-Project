@@ -148,11 +148,12 @@ export default function NotesEditor({ workspaceId, onNavigate }) {
                     </span>
                   </button>
                   <button
-                    className="ghost-btn ghost-btn--danger notes-list-delete"
+                    className="notes-list-delete"
                     onClick={() => handleDelete(note)}
                     aria-label={`Delete ${noteTitle(note.content)}`}
+                    title="Delete note"
                   >
-                    Delete
+                    &times;
                   </button>
                 </div>
               ))

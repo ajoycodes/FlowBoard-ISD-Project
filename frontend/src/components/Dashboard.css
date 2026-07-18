@@ -80,12 +80,23 @@
 .db-card-actions {
   display: flex;
   gap: .5rem;
-  flex-wrap: wrap;
 }
 
-.db-card-actions .ghost-btn {
+.db-card-actions .ghost-btn,
+.db-card-open {
   font-size: .82rem;
   padding: .45rem .85rem;
+}
+
+.db-card-open { flex: 1; }
+
+/* Destructive action separated below a divider so it doesn't
+   compete visually with the safe Open/Activity buttons above it. */
+.db-card-delete {
+  padding-top: .8rem;
+  border-top: 1px solid var(--border);
+  font-size: .82rem;
+  text-align: left;
 }
 
 /* ── Deadline list ─────────────────────────────────────────── */

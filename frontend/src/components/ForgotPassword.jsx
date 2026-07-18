@@ -54,9 +54,11 @@ const [loading, setLoading] = React.useState(false)
   {loading ? 'Sending...' : 'Send reset link'}
 </button>
           {status && <p className="hint">{status}</p>}
-          <button type="button" className="ghost-btn full" onClick={() => onNavigate('login')}>
-            Back to login
-          </button>
+          <div className="auth-links">
+            <button type="button" className="text-link" onClick={() => onNavigate('login')}>
+              Back to login
+            </button>
+          </div>
         </form>
       </section>
     </div>

@@ -92,8 +92,8 @@ export default function RegistrationForm({ onRegistered, onNavigate }) {
           </button>
           {status && <p className="hint">{status}</p>}
 
-          <div className="inline-actions">
-            <button type="button" className="ghost-btn full" onClick={() => onNavigate('login')}>
+          <div className="auth-links">
+            <button type="button" className="text-link" onClick={() => onNavigate('login')}>
               Back to login
             </button>
           </div>

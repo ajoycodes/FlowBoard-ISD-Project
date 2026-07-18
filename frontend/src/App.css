@@ -258,6 +258,19 @@ body {
 
 .inline-actions { display: flex; gap: .75rem; flex-wrap: wrap; }
 
+/* Secondary auth navigation ("Create account", "Forgot password",
+   "Back to login") — plain text links so they read as secondary,
+   not a second row of buttons competing with the primary submit. */
+.auth-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+  text-align: center;
+}
+.auth-links-sep { color: var(--text-tertiary); }
+
 .form-grid { display: grid; gap: 1.1rem; }
 /* auto-collapse when the card is too narrow to fit two fields side by side */
 .two-col   { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
@@ -405,4 +418,55 @@ body {
   font-size: .95rem;
   text-align: center;
   background: var(--surface);
+  margin-bottom: 2.2rem;
+}
+
+/* ── Small icon-style action buttons (task/card footers) ──────── */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .3rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: .35rem .7rem;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: .78rem;
+  font-weight: 500;
+  font-family: inherit;
+  line-height: 1;
+  cursor: pointer;
+  transition: color .2s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
+}
+.icon-btn:hover { color: var(--text); border-color: var(--border-strong); }
+
+.icon-btn--accent {
+  color: var(--accent-text);
+  border-color: var(--accent-soft);
+  background: var(--accent-soft);
+}
+.icon-btn--accent:hover { border-color: var(--accent); }
+
+/* ── Plain text links (secondary actions that shouldn't compete
+   with a primary button, e.g. "Back to login", "Delete task") ── */
+.text-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: var(--accent-text);
+  font-size: .92rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+}
+.text-link:hover { text-decoration: underline; }
+.text-link--danger { color: var(--danger-text); }
+
+.modal-actions--split {
+  justify-content: space-between;
+}
+.modal-actions-right {
+  display: flex;
+  gap: .7rem;
 }

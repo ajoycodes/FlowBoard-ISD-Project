@@ -81,7 +81,7 @@
 
 .notes-list-item {
   display: flex;
-  flex-direction: column;
+  align-items: stretch;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   overflow: hidden;
@@ -93,6 +93,8 @@
 }
 
 .notes-list-main {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: .2rem;
@@ -102,6 +104,27 @@
   font-family: inherit;
   text-align: left;
   cursor: pointer;
+}
+
+/* Small, low-key by default — only reads as destructive on hover,
+   instead of a permanent full-width red block. */
+.notes-list-delete {
+  flex-shrink: 0;
+  width: 2.2rem;
+  border: none;
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-tertiary);
+  font-size: 1.1rem;
+  line-height: 1;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color .2s var(--ease), background .2s var(--ease);
+}
+
+.notes-list-delete:hover {
+  background: var(--danger-soft);
+  color: var(--danger-text);
 }
 
 .notes-list-item--active .notes-list-main {
@@ -128,12 +151,6 @@
 .notes-list-meta {
   font-size: .74rem;
   color: var(--text-tertiary);
-}
-
-.notes-list-delete {
-  border-radius: 0;
-  font-size: .76rem;
-  padding: .35rem;
 }
 
 /* ── Editor ────────────────────────────────────────────────── */

@@ -140,14 +140,20 @@
 }
 
 /* ── Columns ───────────────────────────────────────────────── */
+/* Fixed-width columns that scroll horizontally instead of
+   auto-fit-wrapping to a new row (which stranded the 4th column
+   far below the others at tablet widths). */
 .board-columns {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  display: flex;
   gap: 1rem;
   align-items: start;
+  overflow-x: auto;
+  padding-bottom: .4rem;
 }
 
 .board-column {
+  flex: 1 0 260px;
+  max-width: 320px;
   background: var(--surface-muted);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -220,6 +226,10 @@
 }
 
 /* ── Task card ─────────────────────────────────────────────── */
+/* Compact by default: badges, title, a 2-line description clamp,
+   and an optional deadline chip. Editing (assignee/priority/
+   deadline/status) happens in the Edit modal, not inline — so the
+   card doesn't carry five permanently-open form controls. */
 .task-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -228,27 +238,13 @@
   padding: .9rem;
   display: flex;
   flex-direction: column;
-  gap: .6rem;
+  gap: .5rem;
 }
 
-.task-title {
-  margin: 0;
-  font-size: .93rem;
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1.35;
-}
-
-.task-description {
-  margin: 0;
-  font-size: .84rem;
-  color: var(--text-secondary);
-  line-height: 1.45;
-}
-
-.task-badges {
+.task-card-top {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: .5rem;
 }
 
@@ -263,97 +259,65 @@
   color: var(--accent-text);
   font-size: .7rem;
   font-weight: 700;
+  flex-shrink: 0;
 }
 
-.task-field {
-  display: flex;
-  flex-direction: column;
-  gap: .25rem;
-  flex: 1;
-}
-
-.task-field > span {
-  font-size: .72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  color: var(--text-tertiary);
-}
-
-.task-field select,
-.task-field input {
-  padding: .4rem .55rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  font-size: .82rem;
-  font-family: inherit;
-  color: var(--text);
-}
-
-.task-field select:focus,
-.task-field input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.task-field-row {
-  display: flex;
-  gap: .5rem;
-}
-
-.task-deadline {
+.task-title-btn {
   margin: 0;
-  font-size: .78rem;
-  color: var(--text-tertiary);
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: .93rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.35;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
 }
 
-.task-actions {
+.task-title-btn:hover { color: var(--accent-text); }
+
+.task-description {
+  margin: 0;
+  font-size: .84rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.task-deadline-chip {
+  align-self: flex-start;
+  font-size: .74rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: .15rem .6rem;
+}
+
+.task-deadline-chip--overdue {
+  color: var(--danger-text);
+  background: var(--danger-soft);
+  border-color: rgba(215, 0, 21, .15);
+}
+
+.task-footer {
   display: flex;
-  gap: .4rem;
-  flex-wrap: wrap;
-  padding-top: .2rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  padding-top: .5rem;
   border-top: 1px solid var(--border);
 }
 
-.task-btn {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: .35rem .6rem;
-  background: var(--surface);
-  color: var(--text-secondary);
-  font-size: .76rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: color .2s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
-}
-
-.task-btn:hover {
-  color: var(--text);
-  border-color: var(--border-strong);
-}
-
-.task-btn--advance {
-  color: var(--accent-text);
-  border-color: var(--accent-soft);
-  background: var(--accent-soft);
-}
-
-.task-btn--advance:hover {
-  border-color: var(--accent);
-  color: var(--accent-text);
-}
-
-.task-btn--delete {
-  color: var(--danger-text);
-  margin-left: auto;
-}
-
-.task-btn--delete:hover {
-  border-color: var(--danger-text);
-  background: var(--danger-soft);
-  color: var(--danger-text);
+.task-move-group {
+  display: flex;
+  gap: .35rem;
 }
 
 /* ── Invite modal ──────────────────────────────────────────── */

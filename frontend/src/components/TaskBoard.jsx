@@ -1,11 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   getWorkspace,
   getTasks,
   createTask,
   updateTask,
   updateTaskStatus,
-  assignTask,
   deleteTask,
   getInvitations,
   sendInvitation,
@@ -185,15 +184,8 @@ function InviteMemberModal({ workspaceId, members, onClose }) {
   )
 }
 
-function AddTaskModal({ defaultStatus, members, onClose, onAdd }) {
-  const [form, setForm] = useState({
-    title: '',
-    description: '',
-    priority: 'medium',
-    deadline: '',
-    assigned_to: '',
-    status: defaultStatus || 'todo',
-  })
+function TaskFormModal({ mode, initialValues, members, onClose, onSubmit, onDelete }) {
+  const [form, setForm] = useState(initialValues)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
 
@@ -208,7 +200,7 @@ function AddTaskModal({ defaultStatus, members, onClose, onAdd }) {
 
     try {
       setSaving(true)
-      await onAdd({
+      await onSubmit({
         title: form.title.trim(),
         description: form.description || null,
         priority: form.priority,
@@ -217,15 +209,17 @@ function AddTaskModal({ defaultStatus, members, onClose, onAdd }) {
         assigned_to: form.assigned_to ? Number(form.assigned_to) : null,
       })
     } catch (err) {
-      setError(err.message || 'Failed to create task.')
+      setError(err.message || `Failed to ${mode === 'add' ? 'create' : 'save'} task.`)
       setSaving(false)
     }
   }
 
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <h2 id="modal-title" className="modal-title">Add New Task</h2>
+      <div className="modal" role="dialog" aria-modal="true" aria-labelledby="task-modal-title">
+        <h2 id="task-modal-title" className="modal-title">
+          {mode === 'add' ? 'Add New Task' : 'Edit Task'}
+        </h2>
 
         <form className="stack" onSubmit={handleSubmit} noValidate>
           <div className="form-group">
@@ -303,11 +297,19 @@ function AddTaskModal({ defaultStatus, members, onClose, onAdd }) {
 
           {error && <p className="hint hint--error">{error}</p>}
 
-          <div className="modal-actions">
-            <button type="submit" className="primary-btn" disabled={saving}>
-              {saving ? 'Creating…' : 'Create Task'}
-            </button>
-            <button type="button" className="ghost-btn" onClick={onClose}>Cancel</button>
+          <div className="modal-actions modal-actions--split">
+            {mode === 'edit' ? (
+              <button type="button" className="text-link text-link--danger" onClick={onDelete}>
+                Delete task
+              </button>
+            ) : <span />}
+
+            <div className="modal-actions-right">
+              <button type="button" className="ghost-btn" onClick={onClose}>Cancel</button>
+              <button type="submit" className="primary-btn" disabled={saving}>
+                {saving ? 'Saving…' : mode === 'add' ? 'Create Task' : 'Save Changes'}
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -315,91 +317,67 @@ function AddTaskModal({ defaultStatus, members, onClose, onAdd }) {
   )
 }
 
-function TaskCard({ task, members, onAssign, onUpdate, onMove, onDelete }) {
+function TaskCard({ task, onMove, onEdit }) {
   const colIndex = COLUMNS.findIndex(c => c.key === task.status)
   const prevCol = colIndex > 0 ? COLUMNS[colIndex - 1] : null
   const nextCol = colIndex >= 0 && colIndex < COLUMNS.length - 1 ? COLUMNS[colIndex + 1] : null
+  const isOverdue = task.deadline && task.status !== 'done' &&
+    new Date(task.deadline) < new Date(new Date().toDateString())
 
   return (
     <div className="task-card">
-      <p className="task-title">{task.title}</p>
-
-      {task.description && (
-        <p className="task-description">{task.description}</p>
-      )}
-
-      <div className="task-badges">
+      <div className="task-card-top">
         <span className={priorityClass(task.priority)}>{task.priority || 'low'}</span>
         <span className="task-avatar" title={task.assigned_user?.name || 'Unassigned'}>
           {initials(task.assigned_user?.name)}
         </span>
       </div>
 
-      <label className="task-field">
-        <span>Assignee</span>
-        <select
-          value={task.assigned_user?.id ?? ''}
-          onChange={e => onAssign(task, e.target.value)}
-          aria-label={`Assignee for ${task.title}`}
-        >
-          <option value="" disabled>Unassigned</option>
-          {members.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-        </select>
-      </label>
+      <button className="task-title-btn" onClick={() => onEdit(task)}>
+        {task.title}
+      </button>
 
-      <div className="task-field-row">
-        <label className="task-field">
-          <span>Priority</span>
-          <select
-            value={task.priority || 'low'}
-            onChange={e => onUpdate(task, { priority: e.target.value })}
-            aria-label={`Priority for ${task.title}`}
-          >
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
-          </select>
-        </label>
+      {task.description && (
+        <p className="task-description">{task.description}</p>
+      )}
 
-        <label className="task-field">
-          <span>Deadline</span>
-          <input
-            type="date"
-            value={task.deadline ? task.deadline.slice(0, 10) : ''}
-            onChange={e => onUpdate(task, { deadline: e.target.value || null })}
-            aria-label={`Deadline for ${task.title}`}
-          />
-        </label>
-      </div>
+      {task.deadline && (
+        <span className={`task-deadline-chip${isOverdue ? ' task-deadline-chip--overdue' : ''}`}>
+          Due {fmtDate(task.deadline)}
+        </span>
+      )}
 
-      <p className="task-deadline">{task.deadline ? `Due ${fmtDate(task.deadline)}` : 'No deadline set'}</p>
-
-      <div className="task-actions">
-        {prevCol && (
-          <button
-            className="task-btn"
-            onClick={() => onMove(task, prevCol.key)}
-            title={`Move to ${prevCol.label}`}
-          >
-            &larr; {prevCol.label}
-          </button>
-        )}
-        {nextCol && (
-          <button
-            className="task-btn task-btn--advance"
-            onClick={() => onMove(task, nextCol.key)}
-            title={`Move to ${nextCol.label}`}
-          >
-            {nextCol.label} &rarr;
-          </button>
-        )}
+      <div className="task-footer">
         <button
-          className="task-btn task-btn--delete"
-          onClick={() => window.confirm(`Delete "${task.title}"?`) && onDelete(task)}
-          aria-label={`Delete ${task.title}`}
+          className="icon-btn"
+          onClick={() => onEdit(task)}
+          title="Edit task"
         >
-          Delete
+          Edit
         </button>
+
+        <div className="task-move-group">
+          {prevCol && (
+            <button
+              className="icon-btn"
+              onClick={() => onMove(task, prevCol.key)}
+              aria-label={`Move to ${prevCol.label}`}
+              title={`Move to ${prevCol.label}`}
+            >
+              &larr;
+            </button>
+          )}
+          {nextCol && (
+            <button
+              className="icon-btn icon-btn--accent"
+              onClick={() => onMove(task, nextCol.key)}
+              aria-label={`Move to ${nextCol.label}`}
+              title={`Move to ${nextCol.label}`}
+            >
+              &rarr;
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )
@@ -413,7 +391,7 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState('All Tasks')
   const [search, setSearch] = useState('')
-  const [modal, setModal] = useState(null)
+  const [taskModal, setTaskModal] = useState(null)
   const [inviteOpen, setInviteOpen] = useState(false)
 
   const members = workspace?.members || []
@@ -455,27 +433,18 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
     // Refresh so assigned_user relation is populated
     const taskResult = await getTasks(workspaceId)
     setTasks(taskResult.data || (created ? [created] : []))
-    setModal(null)
+    setTaskModal(null)
   }
 
-  const handleAssign = async (task, userId) => {
-    if (!userId) return
-    try {
-      await assignTask(task.id, Number(userId))
-      const member = members.find(m => m.id === Number(userId))
-      replaceTask({ ...task, assigned_user: member ? { id: member.id, name: member.name } : task.assigned_user })
-    } catch (err) {
-      setError(err.message || 'Failed to assign task.')
-    }
-  }
-
-  const handleUpdateTask = async (task, updates) => {
-    try {
-      const result = await updateTask(task.id, updates)
-      replaceTask({ ...task, ...result.data, assigned_user: task.assigned_user })
-    } catch (err) {
-      setError(err.message || 'Failed to update task.')
-    }
+  const handleEditSubmit = async (task, payload) => {
+    const result = await updateTask(task.id, payload)
+    const member = payload.assigned_to ? members.find(m => m.id === payload.assigned_to) : null
+    replaceTask({
+      ...task,
+      ...result.data,
+      assigned_user: member ? { id: member.id, name: member.name } : null,
+    })
+    setTaskModal(null)
   }
 
   const handleMove = async (task, newStatus) => {
@@ -490,10 +459,13 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
     }
   }
 
-  const handleDelete = async (task) => {
+  const handleDeleteTask = async (task) => {
+    if (!window.confirm(`Delete "${task.title}"? This cannot be undone.`)) return
+
     try {
       await deleteTask(task.id)
       setTasks(prev => prev.filter(t => t.id !== task.id))
+      setTaskModal(null)
     } catch (err) {
       setError(err.message || 'Failed to delete task.')
     }
@@ -556,7 +528,7 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
 
             <button
               className="primary-btn"
-              onClick={() => setModal('todo')}
+              onClick={() => setTaskModal({ mode: 'add', defaultStatus: 'todo' })}
             >
               + Add Task
             </button>
@@ -595,11 +567,8 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
                         <TaskCard
                           key={task.id}
                           task={task}
-                          members={members}
-                          onAssign={handleAssign}
-                          onUpdate={handleUpdateTask}
                           onMove={handleMove}
-                          onDelete={handleDelete}
+                          onEdit={(t) => setTaskModal({ mode: 'edit', task: t })}
                         />
                       ))
                     )}
@@ -607,7 +576,7 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
 
                   <button
                     className="board-col-add-btn"
-                    onClick={() => setModal(col.key)}
+                    onClick={() => setTaskModal({ mode: 'add', defaultStatus: col.key })}
                   >
                     + Add Task
                   </button>
@@ -618,12 +587,38 @@ export default function TaskBoard({ workspaceId, onNavigate }) {
         )}
       </div>
 
-      {modal && (
-        <AddTaskModal
-          defaultStatus={modal}
+      {taskModal?.mode === 'add' && (
+        <TaskFormModal
+          mode="add"
+          initialValues={{
+            title: '',
+            description: '',
+            priority: 'medium',
+            deadline: '',
+            assigned_to: '',
+            status: taskModal.defaultStatus || 'todo',
+          }}
           members={members}
-          onClose={() => setModal(null)}
-          onAdd={handleAdd}
+          onClose={() => setTaskModal(null)}
+          onSubmit={handleAdd}
+        />
+      )}
+
+      {taskModal?.mode === 'edit' && (
+        <TaskFormModal
+          mode="edit"
+          initialValues={{
+            title: taskModal.task.title,
+            description: taskModal.task.description || '',
+            priority: taskModal.task.priority || 'medium',
+            deadline: taskModal.task.deadline ? taskModal.task.deadline.slice(0, 10) : '',
+            assigned_to: taskModal.task.assigned_user?.id ?? '',
+            status: taskModal.task.status,
+          }}
+          members={members}
+          onClose={() => setTaskModal(null)}
+          onSubmit={(payload) => handleEditSubmit(taskModal.task, payload)}
+          onDelete={() => handleDeleteTask(taskModal.task)}
         />
       )}
 

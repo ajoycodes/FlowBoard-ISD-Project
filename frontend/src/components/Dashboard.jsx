@@ -118,7 +118,7 @@ export default function Dashboard({ onNavigate }) {
               </div>
               <div className="db-card-actions">
                 <button
-                  className="ghost-btn"
+                  className="primary-btn db-card-open"
                   onClick={() => onNavigate('workspace', ws.id)}
                 >
                   Open
@@ -129,13 +129,13 @@ export default function Dashboard({ onNavigate }) {
                 >
                   Activity
                 </button>
-                <button
-                  className="ghost-btn ghost-btn--danger"
-                  onClick={() => handleDelete(ws.id)}
-                >
-                  Delete
-                </button>
               </div>
+              <button
+                className="text-link text-link--danger db-card-delete"
+                onClick={() => handleDelete(ws.id)}
+              >
+                Delete workspace
+              </button>
             </div>
           ))}
         </div>
